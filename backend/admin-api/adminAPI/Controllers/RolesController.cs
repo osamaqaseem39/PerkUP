@@ -120,7 +120,50 @@ public class RolesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-}
-}
+    [HttpGet("{id}")]
+    public IActionResult GetRoleById(int id)
+    {
+        try
+        {
+            Role role;
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("GetRoleById", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@RoleId", id);
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            role = new Role
+                            {
+                                RoleID = Convert.ToInt32(reader["RoleID"]),
+                                RoleName = reader["RoleName"].ToString(),
+                                Description = reader["Description"].ToString(),
+                                CreatedBy = Convert.ToInt32(reader["CreatedBy"]),
+                                CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
+                                UpdatedBy = Convert.ToInt32(reader["UpdatedBy"]),
+                                UpdatedAt = Convert.ToDateTime(reader["UpdatedAt"])
+                            };
+
+                            return Ok(role);
+                        }
+                        else
+                        {
+                            return NotFound("Role not found.");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
 
 }
+
