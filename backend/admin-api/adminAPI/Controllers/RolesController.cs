@@ -54,8 +54,8 @@ public class RolesController : ControllerBase
 
         return roles;
     }
-
-    private async Task<List<RolePermission>> GetRolePermissions(int roleId)
+    [HttpGet]
+    public async Task<List<RolePermission>> GetRolePermissions(int roleId)
     {
         List<RolePermission> rolePermissions = new List<RolePermission>();
 
@@ -88,5 +88,39 @@ public class RolesController : ControllerBase
 
         return rolePermissions;
     }
+
+
+
+    [HttpPost]
+    public IActionResult CreateRole([FromBody] Role role)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("CreateRole", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@RoleName", role.RoleName);
+                    command.Parameters.AddWithValue("@Description", role.Description);
+                    command.Parameters.AddWithValue("@CreatedBy", role.CreatedBy);
+                    command.Parameters.AddWithValue("@CreatedAt", role.CreatedAt);
+                    command.Parameters.AddWithValue("@UpdatedBy", role.UpdatedBy);
+                    command.Parameters.AddWithValue("@UpdatedAt", role.UpdatedAt);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            return Ok("Role created successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+}
+}
 
 }
