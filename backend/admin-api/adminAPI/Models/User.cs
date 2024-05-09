@@ -20,7 +20,7 @@ public class User
 
     public string? UserContact { get; set; }
 
-    public string? Password { get; set; }
+    public string Password { get; set; }
 
     public string? Images { get; set; }
 
