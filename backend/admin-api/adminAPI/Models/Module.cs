@@ -8,7 +8,7 @@ public class Module
     public int ModuleID { get; set; }
 
     [Required]
-    public string ModuleName { get; set; }
+    public string? ModuleName { get; set; }
 
     public string? DescriptionSection { get; set; }
 

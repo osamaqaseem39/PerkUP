@@ -21,6 +21,6 @@ public class ModulePermission
     public DateTime UpdatedAt { get; set; }
 
     public Module? Module { get; set; }
-    public Permission Permission { get; set; }
+    public Permission? Permission { get; set; }
 
 }

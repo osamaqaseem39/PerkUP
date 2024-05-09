@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,10 +27,10 @@ public class RolesController : ControllerBase
             using (SqlCommand command = new SqlCommand("GetAllRoles", connection))
             {
                 command.CommandType = CommandType.StoredProcedure;
-                connection.Open();
+                await connection.OpenAsync();
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         Role role = new Role
                         {
@@ -54,8 +55,8 @@ public class RolesController : ControllerBase
 
         return roles;
     }
-    [HttpGet]
-    public async Task<List<RolePermission>> GetRolePermissions(int roleId)
+
+    private async Task<List<RolePermission>> GetRolePermissions(int roleId)
     {
         List<RolePermission> rolePermissions = new List<RolePermission>();
 
@@ -65,10 +66,10 @@ public class RolesController : ControllerBase
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@RoleId", roleId);
-                connection.Open();
+                await connection.OpenAsync();
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         RolePermission rolePermission = new RolePermission
                         {
@@ -89,10 +90,8 @@ public class RolesController : ControllerBase
         return rolePermissions;
     }
 
-
-
     [HttpPost]
-    public IActionResult CreateRole([FromBody] Role role)
+    public async Task<IActionResult> CreateRole([FromBody] Role role)
     {
         try
         {
@@ -108,8 +107,8 @@ public class RolesController : ControllerBase
                     command.Parameters.AddWithValue("@UpdatedBy", role.UpdatedBy);
                     command.Parameters.AddWithValue("@UpdatedAt", role.UpdatedAt);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -120,8 +119,9 @@ public class RolesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+
     [HttpGet("{id}")]
-    public IActionResult GetRoleById(int id)
+    public async Task<IActionResult> GetRoleById(int id)
     {
         try
         {
@@ -133,10 +133,10 @@ public class RolesController : ControllerBase
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@RoleId", id);
 
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    await connection.OpenAsync();
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
-                        if (reader.Read())
+                        if (await reader.ReadAsync())
                         {
                             role = new Role
                             {
@@ -165,5 +165,57 @@ public class RolesController : ControllerBase
         }
     }
 
-}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRole(int id, [FromBody] Role role)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("UpdateRole", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@RoleId", id);
+                    command.Parameters.AddWithValue("@RoleName", role.RoleName);
+                    command.Parameters.AddWithValue("@Description", role.Description);
+                    command.Parameters.AddWithValue("@UpdatedBy", role.UpdatedBy);
+                    command.Parameters.AddWithValue("@UpdatedAt", role.UpdatedAt);
 
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+
+            return Ok("Role updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteRole(int id)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("DeleteRole", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@RoleId", id);
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+
+            return Ok("Role deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+}

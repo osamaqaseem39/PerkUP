@@ -25,6 +25,7 @@ public class Startup
       
         // Add other services as needed
         services.AddControllersWithViews();
+
         // Add other services like authentication, authorization, etc.
     }
 
@@ -42,8 +43,6 @@ public class Startup
         }
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
         app.UseRouting();
 
         app.UseAuthorization();
