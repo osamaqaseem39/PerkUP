@@ -17,7 +17,7 @@ public class PasswordHasher
         var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations);
 
         // Get the hash value
-        byte[] has  h = pbkdf2.GetBytes(HashSize);
+        byte[] hash = pbkdf2.GetBytes(HashSize);
 
         // Combine the salt and hash together in one byte array
         byte[] hashBytes = new byte[SaltSize + HashSize];

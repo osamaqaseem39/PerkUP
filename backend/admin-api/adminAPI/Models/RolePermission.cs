@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class RolePermission
 {
@@ -20,8 +21,9 @@ public class RolePermission
     public DateTime CreatedAt { get; set; }
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
-
+    [NotMapped]
     public Role? Role { get; set; }
-    public Permission Permission { get; set; }
+    [NotMapped]
+    public Permission? Permission { get; set; }
 
 }

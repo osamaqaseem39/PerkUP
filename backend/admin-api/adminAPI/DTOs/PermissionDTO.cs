@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class Role
+public class PermissionDTO
 {
     [Key]
-    public int RoleID { get; set; }
+    public int PermissionID { get; set; }
 
     [Required]
-    public string? RoleName { get; set; }
+    public string? PermissionName { get; set; }
 
     public string? Description { get; set; }
 
@@ -18,5 +18,5 @@ public class Role
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<RolePermission>? RolePermissions { get; set; }
+    public ICollection<RolePermissionDTO>? RolePermissions { get; set; }
 }

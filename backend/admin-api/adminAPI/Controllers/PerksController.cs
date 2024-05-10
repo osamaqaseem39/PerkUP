@@ -18,9 +18,9 @@ public class PerksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Perk>>> GetPerks()
+    public async Task<ActionResult<IEnumerable<PerkDTO>>> GetPerks()
     {
-        List<Perk> perks = new List<Perk>();
+        List<PerkDTO> perks = new List<PerkDTO>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +32,7 @@ public class PerksController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        Perk perk = new Perk
+                        PerkDTO perk = new PerkDTO
                         {
                             PerkID = (int)reader["PerkID"],
                             PerkType = reader["PerkType"].ToString(),
@@ -59,7 +59,7 @@ public class PerksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePerk([FromBody] Perk perk)
+    public async Task<IActionResult> CreatePerk([FromBody] PerkDTO perk)
     {
         try
         {
@@ -96,7 +96,7 @@ public class PerksController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePerk(int id, [FromBody] Perk perk)
+    public async Task<IActionResult> UpdatePerk(int id, [FromBody] PerkDTO perk)
     {
         try
         {
@@ -161,7 +161,7 @@ public class PerksController : ControllerBase
     {
         try
         {
-            Perk perk;
+            PerkDTO perk;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetPerkById", connection))
@@ -174,7 +174,7 @@ public class PerksController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            perk = new Perk
+                            perk = new PerkDTO
                             {
                                 PerkID = Convert.ToInt32(reader["PerkID"]),
                                 PerkType = reader["PerkType"].ToString(),

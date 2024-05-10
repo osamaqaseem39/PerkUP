@@ -18,9 +18,9 @@ public class AddressesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
+    public async Task<ActionResult<IEnumerable<AddressDTO>>> GetAddresses()
     {
-        List<Address> addresses = new List<Address>();
+        List<AddressDTO> addresses = new List<AddressDTO>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +32,7 @@ public class AddressesController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        Address address = new Address
+                        AddressDTO address = new AddressDTO
                         {
                             AddressID = (int)reader["AddressID"],
                             Street = reader["Street"].ToString(),
@@ -57,7 +57,7 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAddress([FromBody] Address address)
+    public async Task<IActionResult> CreateAddress([FromBody] AddressDTO address)
     {
         try
         {
@@ -92,7 +92,7 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAddress(int id, [FromBody] Address address)
+    public async Task<IActionResult> UpdateAddress(int id, [FromBody] AddressDTO address)
     {
         try
         {
@@ -155,7 +155,7 @@ public class AddressesController : ControllerBase
     {
         try
         {
-            Address address;
+            AddressDTO address;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetAddressById", connection))
@@ -168,7 +168,7 @@ public class AddressesController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            address = new Address
+                            address = new AddressDTO
                             {
                                 AddressID = Convert.ToInt32(reader["AddressID"]),
                                 Street = reader["Street"].ToString(),

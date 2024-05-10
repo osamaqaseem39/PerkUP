@@ -19,9 +19,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
     {
-        List<User> users = new List<User>();
+        List<UserDTO> users = new List<UserDTO>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        User user = new User
+                        UserDTO user = new UserDTO
                         {
                             UserID = (int)reader["UserID"],
                             UserType = reader["UserType"].ToString(),
@@ -62,7 +62,7 @@ public class UsersController : ControllerBase
         return users;
     }
     [HttpPost]
-    public async Task<IActionResult> CreateUser(User user)
+    public async Task<IActionResult> CreateUser(UserDTO user)
     {
         try
         {
@@ -80,6 +80,12 @@ public class UsersController : ControllerBase
                 command.Parameters.AddWithValue("@UserEmail", user.UserEmail);
                 command.Parameters.AddWithValue("@UserContact", user.UserContact);
                 command.Parameters.AddWithValue("@Password", PasswordHasher.HashPassword(user.Password)); // Hash password
+                command.Parameters.AddWithValue("@Images", user.Images);
+                command.Parameters.AddWithValue("@Description", user.Description);
+                command.Parameters.AddWithValue("@CreatedBy", user.CreatedBy);
+                command.Parameters.AddWithValue("@CreatedAt", user.CreatedAt);
+                command.Parameters.AddWithValue("@UpdatedBy", user.UpdatedBy);
+                command.Parameters.AddWithValue("@UpdatedAt", user.UpdatedAt);
                 command.Parameters.AddWithValue("@RoleID", user.RoleID);
                 command.Parameters.AddWithValue("@AddressID", user.AddressID);
 
@@ -96,8 +102,9 @@ public class UsersController : ControllerBase
         }
     }
 
+
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, User user)
+    public async Task<IActionResult> UpdateUser(int id, UserDTO user)
     {
         try
         {
@@ -164,7 +171,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            User user;
+            UserDTO user;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetUserById", connection))
@@ -177,7 +184,7 @@ public class UsersController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            user = new User
+                            user = new UserDTO
                             {
                                 UserID = Convert.ToInt32(reader["UserID"]),
                                 UserType = reader["UserType"].ToString(),

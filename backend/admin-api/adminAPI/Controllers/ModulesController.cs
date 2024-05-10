@@ -18,9 +18,9 @@ public class ModulesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Module>>> GetModules()
+    public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules()
     {
-        List<Module> modules = new List<Module>();
+        List<ModuleDTO> modules = new List<ModuleDTO>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +32,7 @@ public class ModulesController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        Module module = new Module
+                        ModuleDTO module = new ModuleDTO
                         {
                             ModuleID = (int)reader["ModuleID"],
                             ModuleName = reader["ModuleName"].ToString(),
@@ -53,7 +53,7 @@ public class ModulesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateModule([FromBody] Module module)
+    public async Task<IActionResult> CreateModule([FromBody] ModuleDTO module)
     {
         try
         {
@@ -84,7 +84,7 @@ public class ModulesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateModule(int id, [FromBody] Module module)
+    public async Task<IActionResult> UpdateModule(int id, [FromBody] ModuleDTO module)
     {
         try
         {
@@ -143,7 +143,7 @@ public class ModulesController : ControllerBase
     {
         try
         {
-            Module module;
+            ModuleDTO module;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetModuleById", connection))
@@ -156,7 +156,7 @@ public class ModulesController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            module = new Module
+                            module = new ModuleDTO
                             {
                                 ModuleID = Convert.ToInt32(reader["ModuleID"]),
                                 ModuleName = reader["ModuleName"].ToString(),

@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/auth")]
@@ -27,8 +24,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            string passwordHash;
-            int roleId;
+            int roleId = 0;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -36,14 +32,14 @@ public class AuthController : ControllerBase
                 command.CommandType = CommandType.StoredProcedure;
 
                 command.Parameters.AddWithValue("@Username", loginRequest.Username);
+                command.Parameters.AddWithValue("@Password", loginRequest.Password); // Pass the password directly
 
                 await connection.OpenAsync();
                 SqlDataReader reader = await command.ExecuteReaderAsync();
 
                 if (reader.Read())
                 {
-                    passwordHash = reader["Password"].ToString();
-                    roleId = Convert.ToInt32(reader["RoleId"]);
+                    roleId = reader["RoleID"] != DBNull.Value ? Convert.ToInt32(reader["RoleID"]) : 0;
                 }
                 else
                 {
@@ -51,10 +47,9 @@ public class AuthController : ControllerBase
                 }
             }
 
-            // Validate password
-            if (!PasswordHasher.VerifyPassword(loginRequest.Password, passwordHash))
+            if (roleId == 0)
             {
-                return Unauthorized("Invalid username or password");
+                return Unauthorized("Role ID not found for the user");
             }
 
             // Generate JWT token

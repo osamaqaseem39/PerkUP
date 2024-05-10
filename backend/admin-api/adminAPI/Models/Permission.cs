@@ -18,5 +18,5 @@ public class Permission
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<RolePermission> RolePermissions { get; set; }
+    public ICollection<RolePermission>? RolePermissions { get; set; }
 }

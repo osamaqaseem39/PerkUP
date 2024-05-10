@@ -18,9 +18,9 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Permission>>> GetPermissions()
+    public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPermissions()
     {
-        List<Permission> permissions = new List<Permission>();
+        List<PermissionDTO> permissions = new List<PermissionDTO>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +32,7 @@ public class PermissionsController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        Permission permission = new Permission
+                        PermissionDTO permission = new PermissionDTO
                         {
                             PermissionID = (int)reader["PermissionID"],
                             PermissionName = reader["PermissionName"].ToString(),
@@ -52,7 +52,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePermission([FromBody] Permission permission)
+    public async Task<IActionResult> CreatePermission([FromBody] PermissionDTO permission)
     {
         try
         {
@@ -82,7 +82,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePermission(int id, [FromBody] Permission permission)
+    public async Task<IActionResult> UpdatePermission(int id, [FromBody] PermissionDTO permission)
     {
         try
         {
@@ -140,7 +140,7 @@ public class PermissionsController : ControllerBase
     {
         try
         {
-            Permission permission;
+            PermissionDTO permission;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetPermissionById", connection))
@@ -153,7 +153,7 @@ public class PermissionsController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            permission = new Permission
+                            permission = new PermissionDTO
                             {
                                 PermissionID = Convert.ToInt32(reader["PermissionID"]),
                                 PermissionName = reader["PermissionName"].ToString(),

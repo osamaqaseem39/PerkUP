@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class ModulePermission
+public class ModulePermissionDTO
 {
     [Key]
     public int ModulePermissionID { get; set; }
@@ -21,8 +21,8 @@ public class ModulePermission
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
     [NotMapped]
-    public Module? Module { get; set; }
+    public ModuleDTO? Module { get; set; }
     [NotMapped]
-    public Permission? Permission { get; set; }
+    public PermissionDTO? Permission { get; set; }
 
 }

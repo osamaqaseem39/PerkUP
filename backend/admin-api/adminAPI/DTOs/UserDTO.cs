@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class User
+public class UserDTO
 {
     [Key]
     public int UserID { get; set; }
@@ -37,7 +37,7 @@ public class User
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
     [NotMapped]
-    public Role? Role { get; set; }
+    public RoleDTO? Role { get; set; }
     [NotMapped]
-    public Address? Address { get; set; }
+    public AddressDTO? Address { get; set; }
 }

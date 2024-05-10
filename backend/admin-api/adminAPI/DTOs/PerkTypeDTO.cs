@@ -1,22 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class Role
+public class PerkTypeDTO
 {
     [Key]
-    public int RoleID { get; set; }
+    public int PerkTypeID { get; set; }
 
     [Required]
-    public string? RoleName { get; set; }
+    public string? TypeName { get; set; }
 
     public string? Description { get; set; }
 
-    // Universal fields
+    public bool IsActive { get; set; }
+
     public int CreatedBy { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
     public int UpdatedBy { get; set; }
+
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<RolePermission>? RolePermissions { get; set; }
+    
+    public virtual PerkDTO? Perk { get; set; }
 }
