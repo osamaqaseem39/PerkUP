@@ -1,4 +1,5 @@
-﻿    using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using System;
     using System.Collections.Generic;
@@ -16,11 +17,11 @@
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRoles()
+    [Authorize]
+    [HttpGet]
+        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
         {
-            List<RoleDTO> roles = new List<RoleDTO>();
+            List<Role> roles = new List<Role>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -32,7 +33,7 @@
                     {
                         while (await reader.ReadAsync())
                         {
-                            RoleDTO role = new RoleDTO
+                            Role role = new Role
                             {
                                 RoleID = (int)reader["RoleID"],
                                 RoleName = reader["RoleName"].ToString(),
@@ -47,51 +48,16 @@
                     }
                 }
 
-                foreach (var role in roles)
-                {
-                    role.RolePermissions = await GetRolePermissions(role.RoleID);
-                }
+             
             }
 
             return roles;
         }
 
-        private async Task<List<RolePermissionDTO>> GetRolePermissions(int roleId)
-        {
-            List<RolePermissionDTO> rolePermissions = new List<RolePermissionDTO>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand command = new SqlCommand("GetRolePermissions", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@RoleId", roleId);
-                    await connection.OpenAsync();
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            RolePermissionDTO rolePermission = new RolePermissionDTO
-                            {
-                                RolePermissionID = (int)reader["RolePermissionID"],
-                                PermissionID = (int)reader["PermissionID"],
-                                RoleID = (int)reader["RoleID"],
-                                CreatedBy = (int)reader["CreatedBy"],
-                                CreatedAt = (DateTime)reader["CreatedAt"],
-                                UpdatedBy = (int)reader["UpdatedBy"],
-                                UpdatedAt = (DateTime)reader["UpdatedAt"]
-                            };
-                            rolePermissions.Add(rolePermission);
-                        }
-                    }
-                }
-            }
-
-            return rolePermissions;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateRole([FromBody] RoleDTO role)
+    [Authorize]
+    [HttpPost]
+        public async Task<IActionResult> CreateRole([FromBody] Role role)
         {
             try
             {
@@ -119,13 +85,13 @@
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-        [HttpGet("{id}")]
+    [Authorize]
+    [HttpGet("{id}")]
         public async Task<IActionResult> GetRoleById(int id)
         {
             try
             {
-                RoleDTO role;
+                Role role;
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     using (SqlCommand command = new SqlCommand("GetRoleById", connection))
@@ -138,7 +104,7 @@
                         {
                             if (await reader.ReadAsync())
                             {
-                                role = new RoleDTO
+                                role = new Role
                                 {
                                     RoleID = Convert.ToInt32(reader["RoleID"]),
                                     RoleName = reader["RoleName"].ToString(),
@@ -164,9 +130,9 @@
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleDTO role)
+    [Authorize]
+    [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] Role role)
         {
             try
             {
@@ -194,7 +160,8 @@
             }
         }
 
-        [HttpDelete("{id}")]
+        [Authorize] 
+    [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
             try

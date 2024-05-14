@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,11 @@ public class PerksController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
+    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PerkDTO>>> GetPerks()
+    public async Task<ActionResult<IEnumerable<Perk>>> GetPerks()
     {
-        List<PerkDTO> perks = new List<PerkDTO>();
+        List<Perk> perks = new List<Perk>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +33,7 @@ public class PerksController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        PerkDTO perk = new PerkDTO
+                        Perk perk = new Perk
                         {
                             PerkID = (int)reader["PerkID"],
                             PerkType = reader["PerkType"].ToString(),
@@ -57,9 +58,9 @@ public class PerksController : ControllerBase
 
         return perks;
     }
-
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreatePerk([FromBody] PerkDTO perk)
+    public async Task<IActionResult> CreatePerk([FromBody] Perk perk)
     {
         try
         {
@@ -96,7 +97,7 @@ public class PerksController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePerk(int id, [FromBody] PerkDTO perk)
+    public async Task<IActionResult> UpdatePerk(int id, [FromBody] Perk perk)
     {
         try
         {
@@ -131,6 +132,7 @@ public class PerksController : ControllerBase
         }
     }
 
+    [Authorize] 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePerk(int id)
     {
@@ -155,13 +157,13 @@ public class PerksController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPerkById(int id)
     {
         try
         {
-            PerkDTO perk;
+            Perk perk;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetPerkById", connection))
@@ -174,7 +176,7 @@ public class PerksController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            perk = new PerkDTO
+                            perk = new Perk
                             {
                                 PerkID = Convert.ToInt32(reader["PerkID"]),
                                 PerkType = reader["PerkType"].ToString(),

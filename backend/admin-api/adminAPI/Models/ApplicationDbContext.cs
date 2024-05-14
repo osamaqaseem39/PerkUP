@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using adminAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
@@ -16,7 +17,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Perk> Perks { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Address> Addresses { get; set; }
-
+    public DbSet<Country> Countries { get; set; }
+    public DbSet<City> Cities { get; set; }
+    public DbSet<Area> Areas { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Configure your model relationships or constraints here
@@ -70,6 +73,17 @@ public class ApplicationDbContext : DbContext
             .HasMany(r => r.RolePermissions)
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleID);
+        modelBuilder.Entity<Country>()
+              .HasMany(c => c.Cities)
+              .WithOne(c => c.Country)
+              .HasForeignKey(c => c.CountryId)
+              .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<City>()
+            .HasMany(c => c.Areas)
+            .WithOne(a => a.City)
+            .HasForeignKey(a => a.CityId)
+            .OnDelete(DeleteBehavior.Cascade);  
     }
 
     public override int SaveChanges()

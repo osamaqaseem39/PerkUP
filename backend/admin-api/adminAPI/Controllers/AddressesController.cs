@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,11 @@ public class AddressesController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
+    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AddressDTO>>> GetAddresses()
+    public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
     {
-        List<AddressDTO> addresses = new List<AddressDTO>();
+        List<Address> addresses = new List<Address>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +33,7 @@ public class AddressesController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        AddressDTO address = new AddressDTO
+                        Address address = new Address
                         {
                             AddressID = (int)reader["AddressID"],
                             Street = reader["Street"].ToString(),
@@ -55,9 +56,9 @@ public class AddressesController : ControllerBase
 
         return addresses;
     }
-
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateAddress([FromBody] AddressDTO address)
+    public async Task<IActionResult> CreateAddress([FromBody] Address address)
     {
         try
         {
@@ -90,9 +91,9 @@ public class AddressesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAddress(int id, [FromBody] AddressDTO address)
+    public async Task<IActionResult> UpdateAddress(int id, [FromBody] Address address)
     {
         try
         {
@@ -125,6 +126,8 @@ public class AddressesController : ControllerBase
         }
     }
 
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAddress(int id)
     {
@@ -149,13 +152,13 @@ public class AddressesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAddressById(int id)
     {
         try
         {
-            AddressDTO address;
+            Address address;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetAddressById", connection))
@@ -168,7 +171,7 @@ public class AddressesController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            address = new AddressDTO
+                            address = new Address
                             {
                                 AddressID = Convert.ToInt32(reader["AddressID"]),
                                 Street = reader["Street"].ToString(),

@@ -19,4 +19,6 @@ public class Permission
     public DateTime UpdatedAt { get; set; }
 
     public ICollection<RolePermission>? RolePermissions { get; set; }
+    public ICollection<ModulePermission>? ModulePermissions { get; set; }
+
 }

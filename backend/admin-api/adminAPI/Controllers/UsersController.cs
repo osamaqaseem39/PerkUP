@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -17,11 +18,11 @@ public class UsersController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
+    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
-        List<UserDTO> users = new List<UserDTO>();
+        List<User> users = new List<User>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -33,7 +34,7 @@ public class UsersController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        UserDTO user = new UserDTO
+                        User user = new User
                         {
                             UserID = (int)reader["UserID"],
                             UserType = reader["UserType"].ToString(),
@@ -61,8 +62,9 @@ public class UsersController : ControllerBase
 
         return users;
     }
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateUser(UserDTO user)
+    public async Task<IActionResult> CreateUser(User user)
     {
         try
         {
@@ -102,9 +104,9 @@ public class UsersController : ControllerBase
         }
     }
 
-
+    [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, UserDTO user)
+    public async Task<IActionResult> UpdateUser(int id, User user)
     {
         try
         {
@@ -141,6 +143,7 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+    [Authorize] 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
@@ -165,13 +168,13 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(int id)
     {
         try
         {
-            UserDTO user;
+            User user;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetUserById", connection))
@@ -184,7 +187,7 @@ public class UsersController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            user = new UserDTO
+                            user = new User
                             {
                                 UserID = Convert.ToInt32(reader["UserID"]),
                                 UserType = reader["UserType"].ToString(),

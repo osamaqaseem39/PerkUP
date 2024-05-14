@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,10 @@ public class ModulesController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules()
+    public async Task<ActionResult<IEnumerable<Module>>> GetModules()
     {
-        List<ModuleDTO> modules = new List<ModuleDTO>();
+        List<Module> modules = new List<Module>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +32,7 @@ public class ModulesController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        ModuleDTO module = new ModuleDTO
+                        Module module = new Module
                         {
                             ModuleID = (int)reader["ModuleID"],
                             ModuleName = reader["ModuleName"].ToString(),
@@ -51,9 +51,9 @@ public class ModulesController : ControllerBase
 
         return modules;
     }
-
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateModule([FromBody] ModuleDTO module)
+    public async Task<IActionResult> CreateModule([FromBody] Module module)
     {
         try
         {
@@ -82,9 +82,9 @@ public class ModulesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateModule(int id, [FromBody] ModuleDTO module)
+    public async Task<IActionResult> UpdateModule(int id, [FromBody] Module module)
     {
         try
         {
@@ -112,7 +112,7 @@ public class ModulesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteModule(int id)
     {
@@ -137,13 +137,13 @@ public class ModulesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetModuleById(int id)
     {
         try
         {
-            ModuleDTO module;
+            Module module;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetModuleById", connection))
@@ -156,7 +156,7 @@ public class ModulesController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            module = new ModuleDTO
+                            module = new Module
                             {
                                 ModuleID = Convert.ToInt32(reader["ModuleID"]),
                                 ModuleName = reader["ModuleName"].ToString(),

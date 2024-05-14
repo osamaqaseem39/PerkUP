@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,11 @@ public class PermissionsController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-
+    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPermissions()
+    public async Task<ActionResult<IEnumerable<Permission>>> GetPermissions()
     {
-        List<PermissionDTO> permissions = new List<PermissionDTO>();
+        List<Permission> permissions = new List<Permission>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +33,7 @@ public class PermissionsController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        PermissionDTO permission = new PermissionDTO
+                        Permission permission = new Permission
                         {
                             PermissionID = (int)reader["PermissionID"],
                             PermissionName = reader["PermissionName"].ToString(),
@@ -50,9 +51,9 @@ public class PermissionsController : ControllerBase
 
         return permissions;
     }
-
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreatePermission([FromBody] PermissionDTO permission)
+    public async Task<IActionResult> CreatePermission([FromBody] Permission permission)
     {
         try
         {
@@ -80,9 +81,9 @@ public class PermissionsController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePermission(int id, [FromBody] PermissionDTO permission)
+    public async Task<IActionResult> UpdatePermission(int id, [FromBody] Permission permission)
     {
         try
         {
@@ -110,7 +111,7 @@ public class PermissionsController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [Authorize] [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePermission(int id)
     {
         try
@@ -134,13 +135,13 @@ public class PermissionsController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPermissionById(int id)
     {
         try
         {
-            PermissionDTO permission;
+            Permission permission;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetPermissionById", connection))
@@ -153,7 +154,7 @@ public class PermissionsController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            permission = new PermissionDTO
+                            permission = new Permission
                             {
                                 PermissionID = Convert.ToInt32(reader["PermissionID"]),
                                 PermissionName = reader["PermissionName"].ToString(),

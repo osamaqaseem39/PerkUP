@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,12 @@ public class PerkTypesController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
+    [Authorize]
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PerkTypeDTO>>> GetPerkTypes()
+    public async Task<ActionResult<IEnumerable<PerkType>>> GetPerkTypes()
     {
-        List<PerkTypeDTO> perkTypes = new List<PerkTypeDTO>();
+        List<PerkType> perkTypes = new List<PerkType>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -32,7 +34,7 @@ public class PerkTypesController : ControllerBase
                 {
                     while (await reader.ReadAsync())
                     {
-                        PerkTypeDTO perkType = new PerkTypeDTO
+                        PerkType perkType = new PerkType
                         {
                             PerkTypeID = (int)reader["PerkTypeID"],
                             TypeName = reader["TypeName"].ToString(),
@@ -51,9 +53,9 @@ public class PerkTypesController : ControllerBase
 
         return perkTypes;
     }
-
+    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreatePerkType([FromBody] PerkTypeDTO perkType)
+    public async Task<IActionResult> CreatePerkType([FromBody] PerkType perkType)
     {
         try
         {
@@ -82,8 +84,9 @@ public class PerkTypesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+    [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePerkType(int id, [FromBody] PerkTypeDTO perkType)
+    public async Task<IActionResult> UpdatePerkType(int id, [FromBody] PerkType perkType)
     {
         try
         {
@@ -112,6 +115,7 @@ public class PerkTypesController : ControllerBase
         }
     }
 
+    [Authorize] 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePerkType(int id)
     {
@@ -136,13 +140,13 @@ public class PerkTypesController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPerkTypeById(int id)
     {
         try
         {
-            PerkTypeDTO perkType;
+            PerkType perkType;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 using (SqlCommand command = new SqlCommand("GetPerkTypeById", connection))
@@ -155,7 +159,7 @@ public class PerkTypesController : ControllerBase
                     {
                         if (await reader.ReadAsync())
                         {
-                            perkType = new PerkTypeDTO
+                            perkType = new PerkType
                             {
                                 PerkTypeID = Convert.ToInt32(reader["PerkTypeID"]),
                                 TypeName = reader["TypeName"].ToString(),
