@@ -67,7 +67,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> CreateUser(User user)
     {
         try
-        {
+        { 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand("CreateUser", connection);

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/auth")]
@@ -24,22 +27,21 @@ public class AuthController : ControllerBase
     {
         try
         {
-            int roleId = 0;
+            string passwordHash;
+            int roleId;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("AuthenticateUser", connection);
-                command.CommandType = CommandType.StoredProcedure;
-
+                SqlCommand command = new SqlCommand("SELECT Password, RoleId FROM Users WHERE Username = @Username", connection);
                 command.Parameters.AddWithValue("@Username", loginRequest.Username);
-                command.Parameters.AddWithValue("@Password", loginRequest.Password); // Pass the password directly
 
                 await connection.OpenAsync();
                 SqlDataReader reader = await command.ExecuteReaderAsync();
 
                 if (reader.Read())
                 {
-                    roleId = reader["RoleID"] != DBNull.Value ? Convert.ToInt32(reader["RoleID"]) : 0;
+                    passwordHash = reader["Password"].ToString();
+                    roleId = Convert.ToInt32(reader["RoleId"]);
                 }
                 else
                 {
@@ -47,13 +49,25 @@ public class AuthController : ControllerBase
                 }
             }
 
-            if (roleId == 0)
+            if (!PasswordHasher.VerifyPassword(loginRequest.Password, passwordHash))
             {
-                return Unauthorized("Role ID not found for the user");
+                return Unauthorized("Invalid username or password");
             }
 
-            // Generate JWT token
-            var tokenString = GenerateJwtToken(loginRequest.Username, roleId);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, loginRequest.Username),
+                    new Claim(ClaimTypes.Role, roleId.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
 
             return Ok(new { Token = tokenString });
         }
@@ -61,23 +75,5 @@ public class AuthController : ControllerBase
         {
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
-    }
-
-    private string GenerateJwtToken(string username, int roleId)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, roleId.ToString())
-            }),
-            Expires = DateTime.UtcNow.AddHours(1), // Token expiry time
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
     }
 }

@@ -9,14 +9,25 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add ApplicationDbContext with error handling
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (connectionString == null)
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or null.");
+}
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (connectionString == null)
-    {
-        throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or null.");
-    }
     options.UseSqlServer(connectionString);
+});
+
+// Enable CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
 });
 
 var app = builder.Build();
@@ -29,7 +40,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseDeveloperExceptionPage();
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseCors(); // Enable CORS middleware
 app.UseAuthorization();
 
 app.MapControllers();
