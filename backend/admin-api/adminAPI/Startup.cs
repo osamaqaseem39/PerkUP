@@ -22,7 +22,7 @@ public class Startup
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
-      
+
         // Add other services as needed
         services.AddControllersWithViews();
 

@@ -29,10 +29,11 @@ public class AuthController : ControllerBase
         {
             string passwordHash;
             int roleId;
+            int userId;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("SELECT Password, RoleId FROM Users WHERE Username = @Username", connection);
+                SqlCommand command = new SqlCommand("SELECT UserId, Password, RoleId FROM Users WHERE Username = @Username", connection);
                 command.Parameters.AddWithValue("@Username", loginRequest.Username);
 
                 await connection.OpenAsync();
@@ -40,6 +41,7 @@ public class AuthController : ControllerBase
 
                 if (reader.Read())
                 {
+                    userId = Convert.ToInt32(reader["UserId"]);
                     passwordHash = reader["Password"].ToString();
                     roleId = Convert.ToInt32(reader["RoleId"]);
                 }
@@ -67,9 +69,9 @@ public class AuthController : ControllerBase
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
+            var bearerTokenString = "Bearer " + tokenHandler.WriteToken(token);
             var tokenString = tokenHandler.WriteToken(token);
-
-            return Ok(new { Token = tokenString });
+            return Ok(new { UserId = userId, BearerToken = bearerTokenString , Token= tokenString});
         }
         catch (Exception ex)
         {

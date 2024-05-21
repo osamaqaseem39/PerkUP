@@ -1,8 +1,8 @@
 name: perkup_admin_app
 description: "A new Flutter project."
 
-# Prevent accidental publishing to pub.dev.
 publish_to: 'none'
+
 
 version: 1.0.0+1
 
@@ -12,27 +12,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-   
+  provider: ^6.0.3
+  http: ^0.13.4
+  shared_preferences: ^2.0.10
+  google_fonts: ^4.0.4
   
-  http: any
-  # bloc: any
-  # flutter_bloc: any
-  # equatable: any
-  provider : any
-
+  cupertino_icons: ^1.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+
   flutter_lints: ^3.0.0
 
+
 flutter:
-  uses-material-design: true
-  # generate: true
-
-  
-
   assets:
-    # Add assets from the images directory to the application.
-    - assets/images/
+    - assets/
+ 
+  uses-material-design: true
+
+ 
