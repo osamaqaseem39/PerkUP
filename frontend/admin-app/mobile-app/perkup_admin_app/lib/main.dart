@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_admin_app/providers/country_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_admin_app/providers/login_provider.dart';
 import 'package:perkup_admin_app/providers/address_provider.dart';
+import 'package:perkup_admin_app/providers/city_provider.dart'; // Import the CityProvider
 import 'package:perkup_admin_app/screens/login/login_screen.dart';
 import 'package:perkup_admin_app/screens/dashboard/welcome_screen.dart';
 
@@ -11,6 +13,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => CountryProvider()),
+        ChangeNotifierProvider(create: (_) => CityProvider()),
       ],
       child: const MyApp(),
     ),
@@ -29,7 +33,7 @@ class MyApp extends StatelessWidget {
           if (loginProvider.token != null) {
             return const WelcomeScreen();
           } else {
-            return LoginScreen();
+            return const LoginScreen();
           }
         },
       ),
