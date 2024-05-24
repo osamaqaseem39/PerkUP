@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perkup_admin_app/models/city/city.dart'; // Import the City model
+import 'package:perkup_admin_app/models/country/country.dart';
 import 'package:perkup_admin_app/services/city_service.dart'; // Import the City service
 
 class CityProvider extends ChangeNotifier {
@@ -11,7 +12,9 @@ class CityProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  final CityService _cityService = CityService(); // Initialize CityService
+  final CityService _cityService = CityService();
+
+  List<Country>? get countries => null; // Initialize CityService
 
   // Fetch cities
   Future<void> fetchCities(String token) async {

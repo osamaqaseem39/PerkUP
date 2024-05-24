@@ -4,6 +4,8 @@ import 'package:perkup_admin_app/providers/login_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_admin_app/models/city/city.dart';
 import 'package:perkup_admin_app/providers/city_provider.dart';
+import 'package:autocomplete_textfield/autocomplete_textfield.dart'; // Import the autocomplete_textfield package
+import 'package:perkup_admin_app/models/country/country.dart'; // Import the Country model
 
 class CityFormScreen extends StatefulWidget {
   final City? city;
@@ -11,21 +13,45 @@ class CityFormScreen extends StatefulWidget {
   const CityFormScreen({super.key, this.city});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CityFormScreenState createState() => _CityFormScreenState();
 }
 
 class _CityFormScreenState extends State<CityFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late String _cityName;
-  late String _countryID; // Added countryID
+  late int _countryID; // Added countryID
+  late List<Country> _countries; // Added list of countries
+  late AutoCompleteTextField<Country>
+      _countryTextField; // Added AutoCompleteTextField
 
   @override
   void initState() {
     super.initState();
+    _countries = Provider.of<CityProvider>(context, listen: false).countries!;
     if (widget.city != null) {
       _cityName = widget.city!.cityName;
       _countryID = widget.city!.countryID;
     }
+    _countryTextField = AutoCompleteTextField<Country>(
+      key: GlobalKey(),
+      clearOnSubmit: false,
+      suggestions: _countries,
+      style: const TextStyle(color: Colors.black),
+      decoration: const InputDecoration(labelText: 'Country'),
+      itemFilter: (item, query) =>
+          item.countryName.toLowerCase().startsWith(query.toLowerCase()),
+      itemSorter: (a, b) => a.countryName.compareTo(b.countryName),
+      itemSubmitted: (item) {
+        setState(() {
+          _countryTextField.textField?.controller!.text = item.countryName;
+          _countryID = item.countryID;
+        });
+      },
+      itemBuilder: (context, item) => ListTile(
+        title: Text(item.countryName),
+      ),
+    );
   }
 
   @override
@@ -50,14 +76,7 @@ class _CityFormScreenState extends State<CityFormScreen> {
                 validator: (value) =>
                     value!.isEmpty ? 'Enter a city name' : null,
               ),
-              TextFormField(
-                // Added TextFormField for countryID
-                initialValue: widget.city?.countryID,
-                decoration: const InputDecoration(labelText: 'Country ID'),
-                onSaved: (value) => _countryID = value!,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter a country ID' : null,
-              ),
+              _countryTextField, // Use the AutoCompleteTextField for country
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
@@ -82,6 +101,7 @@ class _CityFormScreenState extends State<CityFormScreen> {
                     } else {
                       cityProvider.updateCity(city, token!);
                     }
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
                 },
