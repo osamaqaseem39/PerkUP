@@ -8,6 +8,8 @@ import 'package:perkup_admin_app/screens/city/city_form_screen.dart';
 class CityListScreen extends StatelessWidget {
   const CityListScreen({super.key});
 
+  get country => null;
+
   @override
   Widget build(BuildContext context) {
     final cityProvider = Provider.of<CityProvider>(context, listen: false);
@@ -16,7 +18,8 @@ class CityListScreen extends StatelessWidget {
     // Call fetchCities on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final token = loginProvider.token;
-      cityProvider.fetchCities(token!);
+      cityProvider
+          .fetchCities(token!); // Ensure you pass the required arguments
     });
 
     return Scaffold(
@@ -57,7 +60,8 @@ class CityListScreen extends StatelessWidget {
                       final token =
                           Provider.of<LoginProvider>(context, listen: false)
                               .token;
-                      cityProvider.fetchCities(token!);
+                      cityProvider.fetchCities(
+                          token!); // Ensure you pass the required arguments
                     },
                     child: const Text('Retry'),
                   ),
@@ -67,7 +71,7 @@ class CityListScreen extends StatelessWidget {
           }
 
           if (cityProvider.cities.isEmpty) {
-            return const Text("No Data ATM");
+            return const Center(child: Text("No Data ATM"));
           }
 
           return ListView.builder(

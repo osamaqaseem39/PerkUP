@@ -41,7 +41,7 @@ namespace adminAPI.Controllers
                             {
                                 CityID = (int)reader["CityID"],
                                 CityName = reader["CityName"].ToString(),
-                                CountryId = (int)reader["CountryId"],
+                                CountryID = (int)reader["CountryID"],
                                 CreatedBy = (int)reader["CreatedBy"],
                                 CreatedAt = (DateTime)reader["CreatedAt"],
                                 UpdatedBy = (int)reader["UpdatedBy"],
@@ -68,7 +68,7 @@ namespace adminAPI.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@CityName", city.CityName);
-                        command.Parameters.AddWithValue("@CountryId", city.CountryId);
+                        command.Parameters.AddWithValue("@CountryID", city.CountryID);
                         command.Parameters.AddWithValue("@CreatedBy", city.CreatedBy);
                         command.Parameters.AddWithValue("@CreatedAt", city.CreatedAt);
                         command.Parameters.AddWithValue("@UpdatedBy", city.UpdatedBy);
@@ -100,7 +100,7 @@ namespace adminAPI.Controllers
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@CityID", id);
                         command.Parameters.AddWithValue("@CityName", city.CityName);
-                        command.Parameters.AddWithValue("@CountryId", city.CountryId);
+                        command.Parameters.AddWithValue("@CountryID", city.CountryID);
                         command.Parameters.AddWithValue("@UpdatedBy", city.UpdatedBy);
                         command.Parameters.AddWithValue("@UpdatedAt", city.UpdatedAt);
 
@@ -166,7 +166,7 @@ namespace adminAPI.Controllers
                                 {
                                     CityID = Convert.ToInt32(reader["CityID"]),
                                     CityName = reader["CityName"].ToString(),
-                                    CountryId = Convert.ToInt32(reader["CountryId"]),
+                                    CountryID = Convert.ToInt32(reader["CountryID"]),
                                     CreatedBy = Convert.ToInt32(reader["CreatedBy"]),
                                     CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
                                     UpdatedBy = Convert.ToInt32(reader["UpdatedBy"]),

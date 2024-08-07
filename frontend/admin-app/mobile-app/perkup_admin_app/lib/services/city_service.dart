@@ -31,7 +31,7 @@ class CityService {
       body: json.encode(city.toJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to create city');
     }
   }
@@ -59,8 +59,10 @@ class CityService {
       },
     );
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to delete city');
     }
   }
+
+  getCityById(int id, String token) {}
 }

@@ -12,11 +12,11 @@ namespace adminAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AreaController : ControllerBase
+    public class AreasController : ControllerBase
     {
         private readonly string _connectionString;
 
-        public AreaController(IConfiguration configuration)
+        public AreasController(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
@@ -41,7 +41,7 @@ namespace adminAPI.Controllers
                             {
                                 AreaID = (int)reader["AreaID"],
                                 AreaName = reader["AreaName"].ToString(),
-                                CityId = (int)reader["CityId"],
+                                CityID = (int)reader["CityID"],
                                 CreatedBy = (int)reader["CreatedBy"],
                                 CreatedAt = (DateTime)reader["CreatedAt"],
                                 UpdatedBy = (int)reader["UpdatedBy"],
@@ -58,7 +58,7 @@ namespace adminAPI.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateArea([FromBody] Area area)
+        public async Task<IActionResult> CreateAreas([FromBody] Area area)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace adminAPI.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@AreaName", area.AreaName);
-                        command.Parameters.AddWithValue("@CityId", area.CityId);
+                        command.Parameters.AddWithValue("@CityID", area.CityID);
                         command.Parameters.AddWithValue("@CreatedBy", area.CreatedBy);
                         command.Parameters.AddWithValue("@CreatedAt", area.CreatedAt);
                         command.Parameters.AddWithValue("@UpdatedBy", area.UpdatedBy);
@@ -89,7 +89,7 @@ namespace adminAPI.Controllers
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArea(int id, [FromBody] Area area)
+        public async Task<IActionResult> UpdateAreas(int id, [FromBody] Area area)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace adminAPI.Controllers
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@AreaID", id);
                         command.Parameters.AddWithValue("@AreaName", area.AreaName);
-                        command.Parameters.AddWithValue("@CityId", area.CityId);
+                        command.Parameters.AddWithValue("@CityID", area.CityID);
                         command.Parameters.AddWithValue("@UpdatedBy", area.UpdatedBy);
                         command.Parameters.AddWithValue("@UpdatedAt", area.UpdatedAt);
 
@@ -119,7 +119,7 @@ namespace adminAPI.Controllers
 
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteArea(int id)
+        public async Task<IActionResult> DeleteAreas(int id)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace adminAPI.Controllers
                                 {
                                     AreaID = Convert.ToInt32(reader["AreaID"]),
                                     AreaName = reader["AreaName"].ToString(),
-                                    CityId = Convert.ToInt32(reader["CityId"]),
+                                    CityID = Convert.ToInt32(reader["CityID"]),
                                     CreatedBy = Convert.ToInt32(reader["CreatedBy"]),
                                     CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
                                     UpdatedBy = Convert.ToInt32(reader["UpdatedBy"]),

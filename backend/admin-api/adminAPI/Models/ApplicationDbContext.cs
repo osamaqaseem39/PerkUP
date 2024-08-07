@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Module> Modules { get; set; }
     public DbSet<ModulePermission> ModulePermissions { get; set; }
+    public DbSet<PerkType> PerkTypes { get; set; }
     public DbSet<Perk> Perks { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Address> Addresses { get; set; }
@@ -73,17 +74,6 @@ public class ApplicationDbContext : DbContext
             .HasMany(r => r.RolePermissions)
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleID);
-        modelBuilder.Entity<Country>()
-              .HasMany(c => c.Cities)
-              .WithOne(c => c.Country)
-              .HasForeignKey(c => c.CountryId)
-              .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<City>()
-            .HasMany(c => c.Areas)
-            .WithOne(a => a.City)
-            .HasForeignKey(a => a.CityId)
-            .OnDelete(DeleteBehavior.Cascade);  
     }
 
     public override int SaveChanges()

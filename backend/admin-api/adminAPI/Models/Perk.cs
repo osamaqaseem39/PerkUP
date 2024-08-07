@@ -6,7 +6,7 @@ public class Perk
     [Key]
     public int PerkID { get; set; }
 
-    public string? PerkType { get; set; }
+    public int PerkType { get; set; }
 
     [Required]
     public string? PerkName { get; set; }

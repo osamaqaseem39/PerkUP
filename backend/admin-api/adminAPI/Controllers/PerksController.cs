@@ -36,7 +36,7 @@ public class PerksController : ControllerBase
                         Perk perk = new Perk
                         {
                             PerkID = (int)reader["PerkID"],
-                            PerkType = reader["PerkType"].ToString(),
+                            PerkType = (int)reader["PerkType"],
                             PerkName = reader["PerkName"].ToString(),
                             Description = reader["Description"].ToString(),
                             Value = (decimal)reader["Value"],
@@ -179,7 +179,7 @@ public class PerksController : ControllerBase
                             perk = new Perk
                             {
                                 PerkID = Convert.ToInt32(reader["PerkID"]),
-                                PerkType = reader["PerkType"].ToString(),
+                                PerkType = (int)reader["PerkType"],
                                 PerkName = reader["PerkName"].ToString(),
                                 Description = reader["Description"].ToString(),
                                 Value = (decimal)reader["Value"],

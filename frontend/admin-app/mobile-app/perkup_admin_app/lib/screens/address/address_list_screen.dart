@@ -17,7 +17,9 @@ class AddressListScreen extends StatelessWidget {
     // Call fetchAddresses on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final token = loginProvider.token;
-      addressProvider.fetchAddresses(token!);
+      if (token != null) {
+        addressProvider.fetchAddresses(token);
+      }
     });
 
     return Scaffold(
@@ -59,7 +61,9 @@ class AddressListScreen extends StatelessWidget {
                       final token =
                           Provider.of<LoginProvider>(context, listen: false)
                               .token;
-                      addressProvider.fetchAddresses(token!);
+                      if (token != null) {
+                        addressProvider.fetchAddresses(token);
+                      }
                     },
                     child: const Text('Retry'),
                   ),
@@ -69,7 +73,9 @@ class AddressListScreen extends StatelessWidget {
           }
 
           if (addressProvider.addresses.isEmpty) {
-            return const Text("No Data ATM");
+            return const Center(
+              child: Text("No Data ATM"),
+            );
           }
 
           return ListView.builder(

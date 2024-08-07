@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:perkup_admin_app/models/address/address.dart';
 import 'package:perkup_admin_app/services/address_service.dart';
 
-class AddressProvider extends ChangeNotifier {
+class AddressProvider with ChangeNotifier {
   List<Address> _addresses = [];
   bool _isLoading = false;
   String? _errorMessage;

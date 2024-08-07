@@ -29,13 +29,16 @@ namespace adminAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressID"), 1L, 1);
 
+                    b.Property<string>("Area")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
@@ -47,6 +50,9 @@ namespace adminAPI.Migrations
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PostalCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -56,7 +62,7 @@ namespace adminAPI.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UpdatedBy")
@@ -76,10 +82,9 @@ namespace adminAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AreaID"), 1L, 1);
 
                     b.Property<string>("AreaName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CityId")
+                    b.Property<int>("CityID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -96,8 +101,6 @@ namespace adminAPI.Migrations
 
                     b.HasKey("AreaID");
 
-                    b.HasIndex("CityId");
-
                     b.ToTable("Areas");
                 });
 
@@ -110,10 +113,9 @@ namespace adminAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CityID"), 1L, 1);
 
                     b.Property<string>("CityName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CountryId")
+                    b.Property<int>("CountryID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -129,8 +131,6 @@ namespace adminAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CityID");
-
-                    b.HasIndex("CountryId");
 
                     b.ToTable("Cities");
                 });
@@ -278,8 +278,8 @@ namespace adminAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PerkType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PerkType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -296,6 +296,41 @@ namespace adminAPI.Migrations
                     b.HasKey("PerkID");
 
                     b.ToTable("Perks");
+                });
+
+            modelBuilder.Entity("PerkType", b =>
+                {
+                    b.Property<int>("PerkTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PerkTypeID"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("PerkTypeID");
+
+                    b.ToTable("PerkTypes");
                 });
 
             modelBuilder.Entity("Permission", b =>
@@ -476,28 +511,6 @@ namespace adminAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("adminAPI.Models.Area", b =>
-                {
-                    b.HasOne("adminAPI.Models.City", "City")
-                        .WithMany("Areas")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-                });
-
-            modelBuilder.Entity("adminAPI.Models.City", b =>
-                {
-                    b.HasOne("adminAPI.Models.Country", "Country")
-                        .WithMany("Cities")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-                });
-
             modelBuilder.Entity("ModulePermission", b =>
                 {
                     b.HasOne("Module", "Module")
@@ -555,16 +568,6 @@ namespace adminAPI.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("adminAPI.Models.City", b =>
-                {
-                    b.Navigation("Areas");
-                });
-
-            modelBuilder.Entity("adminAPI.Models.Country", b =>
-                {
-                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("Module", b =>

@@ -35,8 +35,12 @@ public class AddressesController : ControllerBase
                     {
                         Address address = new Address
                         {
+
                             AddressID = (int)reader["AddressID"],
+
+                            Name = reader["Name"].ToString(),
                             Street = reader["Street"].ToString(),
+                            Area = reader["Area"].ToString(),
                             City = reader["City"].ToString(),
                             State = reader["State"].ToString(),
                             PostalCode = reader["PostalCode"].ToString(),
@@ -67,7 +71,10 @@ public class AddressesController : ControllerBase
                 using (SqlCommand command = new SqlCommand("CreateAddress", connection))
                 {
                     command.CommandType = CommandType.StoredProcedure;
+
+                    
                     command.Parameters.AddWithValue("@Street", address.Street);
+                 
                     command.Parameters.AddWithValue("@City", address.City);
                     command.Parameters.AddWithValue("@State", address.State);
                     command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
@@ -78,6 +85,8 @@ public class AddressesController : ControllerBase
                     command.Parameters.AddWithValue("@CreatedAt", address.CreatedAt);
                     command.Parameters.AddWithValue("@UpdatedBy", address.UpdatedBy);
                     command.Parameters.AddWithValue("@UpdatedAt", address.UpdatedAt);
+                    command.Parameters.AddWithValue("@Name", address.Name);
+                    command.Parameters.AddWithValue("@Area", address.Area);
 
                     await connection.OpenAsync();
                     await command.ExecuteNonQueryAsync();
@@ -103,7 +112,10 @@ public class AddressesController : ControllerBase
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@AddressID", id);
+
+                    command.Parameters.AddWithValue("@Name", address.Name);
                     command.Parameters.AddWithValue("@Street", address.Street);
+                    command.Parameters.AddWithValue("@Area", address.Area);
                     command.Parameters.AddWithValue("@City", address.City);
                     command.Parameters.AddWithValue("@State", address.State);
                     command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
@@ -174,7 +186,9 @@ public class AddressesController : ControllerBase
                             address = new Address
                             {
                                 AddressID = Convert.ToInt32(reader["AddressID"]),
+                                Name = reader["Street"].ToString(),
                                 Street = reader["Street"].ToString(),
+                                Area = reader["Area"].ToString(),
                                 City = reader["City"].ToString(),
                                 State = reader["State"].ToString(),
                                 PostalCode = reader["PostalCode"].ToString(),

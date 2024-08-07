@@ -73,7 +73,9 @@ class AddressDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Text('Street: ${address.name}'),
             Text('Street: ${address.street}'),
+            Text('Area: ${address.area}'),
             Text('City: ${address.city}'),
             Text('State: ${address.state}'),
             Text('Postal Code: ${address.postalCode}'),

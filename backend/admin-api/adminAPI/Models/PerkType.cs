@@ -22,5 +22,4 @@ public class PerkType
     public DateTime UpdatedAt { get; set; }
 
     
-    public virtual Perk? Perk { get; set; }
 }

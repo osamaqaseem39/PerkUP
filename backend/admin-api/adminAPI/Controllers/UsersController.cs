@@ -18,8 +18,9 @@ public class UsersController : ControllerBase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-    [Authorize]
     [HttpGet]
+
+   
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         List<User> users = new List<User>();
@@ -62,8 +63,8 @@ public class UsersController : ControllerBase
 
         return users;
     }
-    [Authorize]
     [HttpPost]
+
     public async Task<IActionResult> CreateUser(User user)
     {
         try
@@ -103,8 +104,6 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-
-    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, User user)
     {
@@ -143,8 +142,8 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-    [Authorize] 
     [HttpDelete("{id}")]
+
     public async Task<IActionResult> DeleteUser(int id)
     {
         try
@@ -168,7 +167,7 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
-    [Authorize]
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(int id)
     {

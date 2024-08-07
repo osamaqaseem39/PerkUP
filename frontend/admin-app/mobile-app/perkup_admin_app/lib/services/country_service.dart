@@ -31,7 +31,7 @@ class CountryService {
       body: json.encode(country.toJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to create country');
     }
   }
@@ -59,7 +59,7 @@ class CountryService {
       },
     );
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to delete country');
     }
   }
