@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:perkup_admin_app/models/login/login_response.dart';
+import 'package:perkup_user_app/models/login/login_response.dart';
 
 class ApiService {
   static const String baseUrl = 'https://localhost:44320/api';
