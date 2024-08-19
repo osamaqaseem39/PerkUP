@@ -2,39 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_user_app/providers/login_provider.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LoginProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: ThemeData.light().textTheme.apply(
-              fontFamily: 'Poppins',
-            ),
-      ),
-      home: const LoginScreen(),
-    );
-  }
-}
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -80,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset(
-                'assets/login_image.png', // Your image asset
+                '/assets/login_image.png', // Your image asset
                 height: 200,
               ),
               const SizedBox(height: 20),
@@ -112,14 +84,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? const CircularProgressIndicator()
                   : SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: FilledButton(
                         onPressed: () {
                           loginProvider.login(
                             _usernameController.text,
                             _passwordController.text,
                           );
                         },
-                        style: ElevatedButton.styleFrom(
+                        style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
