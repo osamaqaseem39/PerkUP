@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_user_app/screens/signup_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_user_app/providers/login_provider.dart';
 
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset(
-                '/assets/login_image.png', // Your image asset
+                'assets/images/login_image.png',
                 height: 200,
               ),
               const SizedBox(height: 20),
@@ -124,7 +125,11 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
-                  // Handle "Sign up" tap
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SignUpScreen()),
+                  );
                 },
                 child: RichText(
                   text: const TextSpan(

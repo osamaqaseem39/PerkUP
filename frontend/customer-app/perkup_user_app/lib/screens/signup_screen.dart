@@ -30,6 +30,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image.asset(
+              'assets/images/login_image.png',
+              height: 200,
+            ),
             _buildInputField(
               controller: _usernameController,
               hintText: 'Enter your username',
@@ -65,12 +69,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         if (_passwordController.text ==
                             _confirmPasswordController.text) {
                           userProvider.createUser(
-                            _usernameController.text as User,
-                            _emailController.text,
-                            _passwordController.text,
+                            User(
+                              userID: 0, // Or generate an ID as needed
+                              userType: 'customer',
+                              username: _usernameController.text,
+                              displayName: _usernameController.text,
+                              firstName: '',
+                              lastName: '',
+                              userEmail: _emailController.text,
+                              userContact: '',
+                              password: _passwordController.text,
+                              images: '', // Handle images upload as needed
+                              roleID: 1, // Set your default role ID here
+                              description: '',
+                              addressID: 0,
+                            ),
                           );
                         } else {
-                          // Show error message for password mismatch
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Passwords do not match'),
