@@ -8,15 +8,15 @@ public class Address
     public string? Name { get; set; }
     public string? Street { get; set; }
 
-    public int? Area { get; set; }
+    public int? AreaID { get; set; }
 
-    public int? City { get; set; }
+    public int? CityID { get; set; }
 
     public string? State { get; set; }
 
     public string? PostalCode { get; set; }
 
-    public int? Country { get; set; }
+    public int? CountryID { get; set; }
 
     public decimal? Latitude { get; set; }
 

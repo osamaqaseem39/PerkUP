@@ -40,11 +40,11 @@ public class AddressesController : ControllerBase
 
                             Name = reader["Name"].ToString(),
                             Street = reader["Street"].ToString(),
-                            Area = (int)reader["Area"],
-                            City = (int)reader["City"],
+                            AreaID = (int)reader["AreaID"],
+                            CityID = (int)reader["CityID"],
                             State = reader["State"].ToString(),
                             PostalCode = reader["PostalCode"].ToString(),
-                            Country = (int)reader["Country"],
+                            CountryID = (int)reader["CountryID"],
                             Latitude = reader["Latitude"] != DBNull.Value ? (decimal)reader["Latitude"] : (decimal?)null,
                             Longitude = reader["Longitude"] != DBNull.Value ? (decimal)reader["Longitude"] : (decimal?)null,
                             CreatedBy = (int)reader["CreatedBy"],
@@ -75,10 +75,10 @@ public class AddressesController : ControllerBase
                     
                     command.Parameters.AddWithValue("@Street", address.Street);
                  
-                    command.Parameters.AddWithValue("@City", address.City);
+                    command.Parameters.AddWithValue("@CityID", address.CityID);
                     command.Parameters.AddWithValue("@State", address.State);
                     command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
-                    command.Parameters.AddWithValue("@Country", address.Country);
+                    command.Parameters.AddWithValue("@CountryID", address.CountryID);
                     command.Parameters.AddWithValue("@Latitude", address.Latitude ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Longitude", address.Longitude ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@CreatedBy", address.CreatedBy);
@@ -86,7 +86,7 @@ public class AddressesController : ControllerBase
                     command.Parameters.AddWithValue("@UpdatedBy", address.UpdatedBy);
                     command.Parameters.AddWithValue("@UpdatedAt", address.UpdatedAt);
                     command.Parameters.AddWithValue("@Name", address.Name);
-                    command.Parameters.AddWithValue("@Area", address.Area);
+                    command.Parameters.AddWithValue("@AreaID", address.AreaID);
 
                     await connection.OpenAsync();
                     await command.ExecuteNonQueryAsync();
@@ -115,11 +115,11 @@ public class AddressesController : ControllerBase
 
                     command.Parameters.AddWithValue("@Name", address.Name);
                     command.Parameters.AddWithValue("@Street", address.Street);
-                    command.Parameters.AddWithValue("@Area", address.Area);
-                    command.Parameters.AddWithValue("@City", address.City);
+                    command.Parameters.AddWithValue("@AreaID", address.AreaID);
+                    command.Parameters.AddWithValue("@CityID", address.CityID);
                     command.Parameters.AddWithValue("@State", address.State);
                     command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
-                    command.Parameters.AddWithValue("@Country", address.Country);
+                    command.Parameters.AddWithValue("@CountryID", address.CountryID);
                     command.Parameters.AddWithValue("@Latitude", address.Latitude ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Longitude", address.Longitude ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@UpdatedBy", address.UpdatedBy);
@@ -186,13 +186,13 @@ public class AddressesController : ControllerBase
                             address = new Address
                             {
                                 AddressID = Convert.ToInt32(reader["AddressID"]),
-                                Name = reader["Street"].ToString(),
+                                Name = reader["Name"].ToString(),
                                 Street = reader["Street"].ToString(),
-                                Area = (int)reader["Area"],
-                                City = (int)reader["City"],
+                                AreaID = (int)reader["AreaID"],
+                                CityID = (int)reader["CityID"],
                                 State = reader["State"].ToString(),
                                 PostalCode = reader["PostalCode"].ToString(),
-                                Country = (int)reader["Country"],
+                                CountryID = (int)reader["CountryID"],
                                 Latitude = reader["Latitude"] != DBNull.Value ? (decimal)reader["Latitude"] : (decimal?)null,
                                 Longitude = reader["Longitude"] != DBNull.Value ? (decimal)reader["Longitude"] : (decimal?)null,
                                 CreatedBy = Convert.ToInt32(reader["CreatedBy"]),

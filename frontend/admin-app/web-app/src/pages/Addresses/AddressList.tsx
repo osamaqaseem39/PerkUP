@@ -3,51 +3,51 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
-
 interface Address {
   AddressID: number;
   AddressName: string;
 }
 
 const AddressList = () => {
-  const [Addresses, setAddresses] = useState<Address[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [AddressToDelete, setAddressToDelete] = useState<number | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
+       
         const response = await api.get('/Addresses');
         setAddresses(response.data);
       } catch (error) {
-        console.error('Error fetching Addresses:', error);
+        console.error('Error fetching addresses:', error);
       }
     };
 
     fetchAddresses();
   }, []);
 
-  const handleEditClick = (AddressID: number) => {
-    navigate(`/Addressform/${AddressID}`);
+  const handleEditClick = (addressID: number) => {
+    navigate(`/Addressform/${addressID}`);
   };
 
   const handleAddNewClick = () => {
     navigate('/Addressform');
   };
 
-  const handleDeleteClick = (AddressID: number) => {
-    setAddressToDelete(AddressID);
+  const handleDeleteClick = (addressID: number) => {
+    setAddressToDelete(addressID);
     setShowModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (AddressToDelete !== null) {
+    if (addressToDelete !== null) {
       try {
-        await api.delete(`/Addresses/${AddressToDelete}`);
-        setAddresses(Addresses.filter((Address) => Address.AddressID !== AddressToDelete));
+        await api.delete(`/Addresses/${addressToDelete}`);
+        setAddresses((prevAddresses) => prevAddresses.filter((address) => address.AddressID !== addressToDelete));
       } catch (error) {
-        console.error('Error deleting Address:', error);
+        console.error('Error deleting address:', error);
       } finally {
         setShowModal(false);
         setAddressToDelete(null);
@@ -75,16 +75,16 @@ const AddressList = () => {
             </tr>
           </thead>
           <tbody>
-            {Addresses.map((Address) => (
-              <tr key={Address.AddressID}>
+            {addresses.map((address) => (
+              <tr key={address.AddressID}>
                 <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-                  <h5 className="font-medium text-black dark:text-white">{Address.AddressName}</h5>
+                  <h5 className="font-medium text-black dark:text-white">{address.AddressName}</h5>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
                     <button
                       className="hover:text-primary"
-                      onClick={() => handleEditClick(Address.AddressID)}
+                      onClick={() => handleEditClick(address.AddressID)}
                     >
                       <svg
                         className="fill-current"
@@ -104,7 +104,7 @@ const AddressList = () => {
                     </button>
                     <button
                       className="hover:text-primary"
-                      onClick={() => handleDeleteClick(Address.AddressID)}
+                      onClick={() => handleDeleteClick(address.AddressID)}
                     >
                       <svg
                         className="fill-current"
@@ -131,7 +131,7 @@ const AddressList = () => {
         onClose={() => setShowModal(false)}
         onConfirm={handleConfirmDelete}
         title="Confirm Deletion"
-        message="Are you sure you want to delete this Address?"
+        message="Are you sure you want to delete this address?"
       />
     </div>
   );

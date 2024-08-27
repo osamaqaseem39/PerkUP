@@ -1,8 +1,6 @@
 ﻿using System;
-<<<<<<< HEAD
-=======
+
 using System.Collections.Generic;
->>>>>>> refs/remotes/origin/main
 using System.ComponentModel.DataAnnotations;
 
 public class Menu

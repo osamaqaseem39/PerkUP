@@ -29,14 +29,14 @@ namespace adminAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressID"), 1L, 1);
 
-                    b.Property<string>("Area")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AreaID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CityID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CountryID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -45,10 +45,10 @@ namespace adminAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,10)");
 
                     b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,10)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -70,7 +70,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("AddressID");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("adminAPI.Models.Area", b =>
@@ -101,7 +101,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("AreaID");
 
-                    b.ToTable("Areas", (string)null);
+                    b.ToTable("Areas");
                 });
 
             modelBuilder.Entity("adminAPI.Models.City", b =>
@@ -132,7 +132,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("CityID");
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("adminAPI.Models.Country", b =>
@@ -160,7 +160,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("CountryID");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("Menu", b =>
@@ -209,6 +209,9 @@ namespace adminAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemID"), 1L, 1);
 
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -248,6 +251,8 @@ namespace adminAPI.Migrations
 
                     b.HasKey("MenuItemID");
 
+                    b.HasIndex("MenuID");
+
                     b.ToTable("MenuItems");
                 });
 
@@ -283,7 +288,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("ModuleID");
 
-                    b.ToTable("Modules", (string)null);
+                    b.ToTable("Modules");
                 });
 
             modelBuilder.Entity("ModulePermission", b =>
@@ -313,9 +318,6 @@ namespace adminAPI.Migrations
                     b.Property<int>("PermissionID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PermissionID1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -328,9 +330,7 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("PermissionID");
 
-                    b.HasIndex("PermissionID1");
-
-                    b.ToTable("ModulePermissions", (string)null);
+                    b.ToTable("ModulePermissions");
                 });
 
             modelBuilder.Entity("Perk", b =>
@@ -383,7 +383,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PerkID");
 
-                    b.ToTable("Perks", (string)null);
+                    b.ToTable("Perks");
                 });
 
             modelBuilder.Entity("PerkType", b =>
@@ -418,7 +418,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PerkTypeID");
 
-                    b.ToTable("PerkTypes", (string)null);
+                    b.ToTable("PerkTypes");
                 });
 
             modelBuilder.Entity("Permission", b =>
@@ -450,7 +450,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PermissionID");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("Role", b =>
@@ -482,7 +482,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("RoleID");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("RolePermission", b =>
@@ -527,7 +527,7 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("RoleID");
 
-                    b.ToTable("RolePermissions", (string)null);
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -596,7 +596,18 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("RoleID");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MenuItem", b =>
+                {
+                    b.HasOne("Menu", "Menu")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("MenuID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
                 });
 
             modelBuilder.Entity("ModulePermission", b =>
@@ -608,14 +619,10 @@ namespace adminAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("Permission", "Permission")
-                        .WithMany()
+                        .WithMany("ModulePermissions")
                         .HasForeignKey("PermissionID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Permission", null)
-                        .WithMany("ModulePermissions")
-                        .HasForeignKey("PermissionID1");
 
                     b.Navigation("Module");
 
@@ -656,6 +663,11 @@ namespace adminAPI.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Menu", b =>
+                {
+                    b.Navigation("MenuItems");
                 });
 
             modelBuilder.Entity("Module", b =>

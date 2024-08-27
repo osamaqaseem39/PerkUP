@@ -34,7 +34,7 @@ interface Area {
   areaName: string;
 }
 
-const initialFormData: Address = {
+const initialFormData: Partial<Address> = {
   addressID: 0,
   name: '',
   street: '',
@@ -52,20 +52,24 @@ const initialFormData: Address = {
 };
 
 const AddressForm = ({ addressID }: { addressID?: number | null }) => {
-  const [formData, setFormData] = useState<Address>(initialFormData);
+  const [formData, setFormData] = useState<Partial<Address>>(initialFormData);
   const [countries, setCountries] = useState<Country[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const navigate = useNavigate();
 
-  // Fetch address data if addressID is provided
   useEffect(() => {
     const fetchAddress = async () => {
       if (addressID !== null && addressID !== undefined) {
         try {
           const response = await api.get(`/Addresses/${addressID}`);
-          setFormData(response.data);
+          const addressData = response.data;
+          setFormData(addressData);
+
+          // Fetch cities and areas based on IDs
+          fetchCities(addressData.countryID);
+          fetchAreas(addressData.cityID);
         } catch (error) {
           console.error('Error fetching address data:', error);
         }
@@ -75,7 +79,6 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     fetchAddress();
   }, [addressID]);
 
-  // Fetch countries
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -89,66 +92,69 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     fetchCountries();
   }, []);
 
-  // Fetch cities based on selected country
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (formData.countryID) {
-        try {
-          const response = await api.get(`/Cities?countryID=${formData.countryID}`);
-          setCities(response.data);
-        } catch (error) {
-          console.error('Error fetching cities:', error);
-        }
-      } else {
-        setCities([]);
+  const fetchCities = async (countryID: number) => {
+    if (countryID) {
+      try {
+        const response = await api.get(`/Cities?countryID=${countryID}`);
+        setCities(response.data);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
       }
-    };
+    } else {
+      setCities([]);
+    }
+  };
 
-    fetchCities();
-  }, [formData.countryID]);
-
-  // Fetch areas based on selected city
-  useEffect(() => {
-    const fetchAreas = async () => {
-      if (formData.cityID) {
-        try {
-          const response = await api.get(`/Areas?cityID=${formData.cityID}`);
-          setAreas(response.data);
-        } catch (error) {
-          console.error('Error fetching areas:', error);
-        }
-      } else {
-        setAreas([]);
+  const fetchAreas = async (cityID: number) => {
+    if (cityID) {
+      try {
+        const response = await api.get(`/Areas?cityID=${cityID}`);
+        setAreas(response.data);
+      } catch (error) {
+        console.error('Error fetching areas:', error);
       }
-    };
-
-    fetchAreas();
-  }, [formData.cityID]);
+    } else {
+      setAreas([]);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'latitude' || name === 'longitude' ? parseFloat(value) : value,
+      [name]: value,
     });
+  };
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCountryID = Number(e.target.value);
+    setFormData({ ...formData, countryID: selectedCountryID });
+    fetchCities(selectedCountryID);
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCityID = Number(e.target.value);
+    setFormData({ ...formData, cityID: selectedCityID });
+    fetchAreas(selectedCityID);
+  };
+
+  const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedAreaID = Number(e.target.value);
+    setFormData({ ...formData, areaID: selectedAreaID });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
       if (addressID !== null && addressID !== undefined) {
-        // Update existing address
         await api.put(`/Addresses/${formData.addressID}`, formData);
         setAlert({ type: 'success', message: 'Address updated successfully!' });
       } else {
-        // Create new address
         const response = await api.post('/Addresses', formData);
         setFormData(response.data);
         setAlert({ type: 'success', message: 'Address created successfully!' });
       }
 
-      // Optionally reset the form after successful submission
       setFormData(initialFormData);
       navigate('/address');
     } catch (error) {
@@ -190,37 +196,24 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             type="text"
             id="name"
             name="name"
-            value={formData.name}
+            value={formData.name || ''}
             onChange={handleChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
         </div>
 
-        <div>
-          <label htmlFor="street" className="mb-3 block text-black dark:text-white">
-            Street
-          </label>
-          <input
-            type="text"
-            id="street"
-            name="street"
-            value={formData.street}
-            onChange={handleChange}
-            required
-            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-          />
-        </div>
+       
 
         <div>
-          <label htmlFor="countryID" className="mb-3 block text-black dark:text-white">
+          <label htmlFor="countryName" className="mb-3 block text-black dark:text-white">
             Country
           </label>
           <select
-            id="countryID"
+            id="countryName"
             name="countryID"
-            value={formData.countryID}
-            onChange={handleChange}
+            value={formData.countryID || ''}
+            onChange={handleCountryChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           >
@@ -232,7 +225,6 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             ))}
           </select>
         </div>
-
         <div>
           <label htmlFor="state" className="mb-3 block text-black dark:text-white">
             State
@@ -240,7 +232,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
           <select
             id="state"
             name="state"
-            value={formData.state}
+            value={formData.state || ''}
             onChange={handleChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -252,16 +244,15 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             <option value="KPK">KPK</option>
           </select>
         </div>
-
         <div>
-          <label htmlFor="cityID" className="mb-3 block text-black dark:text-white">
+          <label htmlFor="cityName" className="mb-3 block text-black dark:text-white">
             City
           </label>
           <select
-            id="cityID"
+            id="cityName"
             name="cityID"
-            value={formData.cityID}
-            onChange={handleChange}
+            value={formData.cityID || ''}
+            onChange={handleCityChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           >
@@ -275,14 +266,14 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
         </div>
 
         <div>
-          <label htmlFor="areaID" className="mb-3 block text-black dark:text-white">
+          <label htmlFor="areaName" className="mb-3 block text-black dark:text-white">
             Area
           </label>
           <select
-            id="areaID"
+            id="areaName"
             name="areaID"
-            value={formData.areaID}
-            onChange={handleChange}
+            value={formData.areaID || ''}
+            onChange={handleAreaChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           >
@@ -296,6 +287,21 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
         </div>
 
         <div>
+          <label htmlFor="street" className="mb-3 block text-black dark:text-white">
+            Street
+          </label>
+          <input
+            type="text"
+            id="street"
+            name="street"
+            value={formData.street || ''}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          />
+        </div>
+
+        <div>
           <label htmlFor="postalCode" className="mb-3 block text-black dark:text-white">
             Postal Code
           </label>
@@ -303,7 +309,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             type="text"
             id="postalCode"
             name="postalCode"
-            value={formData.postalCode}
+            value={formData.postalCode || ''}
             onChange={handleChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -315,13 +321,11 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             Latitude
           </label>
           <input
-            type="number"
-            step="0.000001"
+            type="text"
             id="latitude"
             name="latitude"
-            value={formData.latitude}
+            value={formData.latitude || ''}
             onChange={handleChange}
-            required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
         </div>
@@ -331,23 +335,88 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             Longitude
           </label>
           <input
-            type="number"
-            step="0.000001"
+            type="text"
             id="longitude"
             name="longitude"
-            value={formData.longitude}
+            value={formData.longitude || ''}
             onChange={handleChange}
-            required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
         </div>
 
-        <div className="flex justify-between">
+        {addressID && (
+          <>
+            <div>
+              <label htmlFor="createdBy" className="mb-3 block text-black dark:text-white">
+                Created By
+              </label>
+              <input
+                type="text"
+                id="createdBy"
+                name="createdBy"
+                value={formData.createdBy || ''}
+                readOnly
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="createdAt" className="mb-3 block text-black dark:text-white">
+                Created At
+              </label>
+              <input
+                type="text"
+                id="createdAt"
+                name="createdAt"
+                value={formData.createdAt || ''}
+                readOnly
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="updatedBy" className="mb-3 block text-black dark:text-white">
+                Updated By
+              </label>
+              <input
+                type="text"
+                id="updatedBy"
+                name="updatedBy"
+                value={formData.updatedBy || ''}
+                readOnly
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="updatedAt" className="mb-3 block text-black dark:text-white">
+                Updated At
+              </label>
+              <input
+                type="text"
+                id="updatedAt"
+                name="updatedAt"
+                value={formData.updatedAt || ''}
+                readOnly
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
+              />
+            </div>
+          </>
+        )}
+
+        <div className="flex items-center gap-4">
           <button
             type="submit"
-            className="w-full rounded-lg border border-primary bg-primary py-3 px-5 text-base font-medium text-white transition hover:bg-opacity-90"
+            className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-90"
           >
             {addressID ? 'Update Address' : 'Create Address'}
+          </button>
+          <button
+            type="button"
+            onClick={handleBackClick}
+            className="bg-secondary text-white py-2 px-4 rounded-lg hover:bg-opacity-90"
+          >
+            Back
           </button>
         </div>
       </form>
