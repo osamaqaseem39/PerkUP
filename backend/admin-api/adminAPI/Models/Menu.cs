@@ -18,19 +18,13 @@ public class Menu
     public string? Image { get; set; }
 
     public bool IsActive { get; set; }
-<<<<<<< HEAD
-=======
 
->>>>>>> refs/remotes/origin/main
-    // Universal fields
     public int CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
     public int UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
-<<<<<<< HEAD
-=======
+
 
     // Navigation property - this should be a collection
     public List<MenuItem>? MenuItems { get; set; }
->>>>>>> refs/remotes/origin/main
 }
