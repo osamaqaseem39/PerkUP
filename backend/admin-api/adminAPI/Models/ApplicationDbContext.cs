@@ -18,7 +18,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Area> Areas { get; set; }
 
     public DbSet<Menu> Menus { get; set; }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/main
     public DbSet<MenuItem> MenuItems { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +74,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(r => r.RolePermissions)
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleID);
+<<<<<<< HEAD
 
         // Decimal precision and scale configuration
         modelBuilder.Entity<Address>()
@@ -101,6 +105,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .Property(p => p.Value)
             .HasColumnType("decimal(18, 2)");
     }
+=======
+        modelBuilder.Entity<Menu>()
+           .HasMany(m => m.MenuItems)
+           .WithOne(mi => mi.Menu)
+           .HasForeignKey(mi => mi.MenuID);
+
+        modelBuilder.Entity<MenuItem>()
+            .HasOne(mi => mi.Menu)
+            .WithMany(m => m.MenuItems)
+            .HasForeignKey(mi => mi.MenuID);
+    }
+
+
+>>>>>>> refs/remotes/origin/main
     public override int SaveChanges()
     {
         // Custom logic here, if needed
