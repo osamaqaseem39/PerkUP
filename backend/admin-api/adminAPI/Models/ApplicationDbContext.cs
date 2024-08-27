@@ -21,6 +21,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Country> Countries { get; set; }
     public DbSet<City> Cities { get; set; }
     public DbSet<Area> Areas { get; set; }
+
+    public DbSet<Menu> Menus { get; set; }
+    public DbSet<MenuItem> MenuItems { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Configure your model relationships or constraints here
@@ -74,7 +77,17 @@ public class ApplicationDbContext : DbContext
             .HasMany(r => r.RolePermissions)
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleID);
+        modelBuilder.Entity<Menu>()
+           .HasMany(m => m.MenuItems)
+           .WithOne(mi => mi.Menu)
+           .HasForeignKey(mi => mi.MenuID);
+
+        modelBuilder.Entity<MenuItem>()
+            .HasOne(mi => mi.Menu)
+            .WithMany(m => m.MenuItems)
+            .HasForeignKey(mi => mi.MenuID);
     }
+
 
     public override int SaveChanges()
     {
