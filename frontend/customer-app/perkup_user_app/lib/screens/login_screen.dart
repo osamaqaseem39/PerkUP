@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:perkup_user_app/screens/signup_screen.dart';
+//import 'package:perkup_user_app/screens/signup_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_user_app/providers/login_provider.dart';
 
@@ -124,13 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignUpScreen()),
-                  );
-                },
+                //   onTap: () {
+                //        Navigator.push(
+//context,
+                //  MaterialPageRoute(
+                //builder: (context) => const SignUpScreen()),
+                //    );
+                //   },
                 child: RichText(
                   text: const TextSpan(
                     text: "Don't have an account? ",

@@ -70,7 +70,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("AddressID");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("adminAPI.Models.Area", b =>
@@ -101,7 +101,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("AreaID");
 
-                    b.ToTable("Areas");
+                    b.ToTable("Areas", (string)null);
                 });
 
             modelBuilder.Entity("adminAPI.Models.City", b =>
@@ -132,7 +132,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("CityID");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("adminAPI.Models.Country", b =>
@@ -160,7 +160,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("CountryID");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("Module", b =>
@@ -195,7 +195,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("ModuleID");
 
-                    b.ToTable("Modules");
+                    b.ToTable("Modules", (string)null);
                 });
 
             modelBuilder.Entity("ModulePermission", b =>
@@ -242,7 +242,7 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("PermissionID1");
 
-                    b.ToTable("ModulePermissions");
+                    b.ToTable("ModulePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Perk", b =>
@@ -295,7 +295,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PerkID");
 
-                    b.ToTable("Perks");
+                    b.ToTable("Perks", (string)null);
                 });
 
             modelBuilder.Entity("PerkType", b =>
@@ -330,7 +330,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PerkTypeID");
 
-                    b.ToTable("PerkTypes");
+                    b.ToTable("PerkTypes", (string)null);
                 });
 
             modelBuilder.Entity("Permission", b =>
@@ -362,7 +362,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("PermissionID");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
                 });
 
             modelBuilder.Entity("Role", b =>
@@ -394,7 +394,7 @@ namespace adminAPI.Migrations
 
                     b.HasKey("RoleID");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("RolePermission", b =>
@@ -439,7 +439,7 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("RoleID");
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("User", b =>
@@ -508,7 +508,7 @@ namespace adminAPI.Migrations
 
                     b.HasIndex("RoleID");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ModulePermission", b =>

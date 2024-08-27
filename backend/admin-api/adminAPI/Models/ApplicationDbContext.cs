@@ -1,15 +1,10 @@
 ﻿using adminAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-       : base(options)
-    {
-    }
 
-    // DbSet properties for your models
-    public DbSet<Role> Roles { get; set; }
+     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Module> Modules { get; set; }
@@ -21,10 +16,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<Country> Countries { get; set; }
     public DbSet<City> Cities { get; set; }
     public DbSet<Area> Areas { get; set; }
+
+    public DbSet<Menu> Menus { get; set; }
+
+    public DbSet<MenuItem> MenuItems { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure your model relationships or constraints here
-
         // Role - RolePermission relationship
         modelBuilder.Entity<RolePermission>()
             .HasKey(rp => rp.RolePermissionID);
@@ -36,9 +33,9 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<RolePermission>()
             .HasOne(rp => rp.Permission)
-            .WithMany(p => p.RolePermissions) // Assuming Permission has a navigation property pointing back to RolePermission
+            .WithMany(p => p.RolePermissions)
             .HasForeignKey(rp => rp.PermissionID)
-            .OnDelete(DeleteBehavior.Cascade); // Example of cascading delete behavior
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Module - ModulePermission relationship
         modelBuilder.Entity<ModulePermission>()
@@ -51,31 +48,59 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<ModulePermission>()
             .HasOne(mp => mp.Permission)
-            .WithMany() // Assuming Permission has a navigation property pointing back to ModulePermission
+            .WithMany(p => p.ModulePermissions)
             .HasForeignKey(mp => mp.PermissionID)
-            .OnDelete(DeleteBehavior.Cascade); // Example of cascading delete behavior
+            .OnDelete(DeleteBehavior.Cascade);
 
         // User - Address relationship
         modelBuilder.Entity<User>()
             .HasOne(u => u.Address)
             .WithOne()
-            .HasForeignKey<User>(u => u.AddressID) // Assuming AddressID is the foreign key property
-            .OnDelete(DeleteBehavior.Cascade); // Example of cascading delete behavior
+            .HasForeignKey<User>(u => u.AddressID)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // User - Role relationship
         modelBuilder.Entity<User>()
             .HasOne(u => u.Role)
             .WithMany()
-            .HasForeignKey(u => u.RoleID) // Assuming RoleID is the foreign key property
-            .OnDelete(DeleteBehavior.Cascade); // Example of cascading delete behavior
+            .HasForeignKey(u => u.RoleID)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Role - RolePermission relationship (inverse)
         modelBuilder.Entity<Role>()
             .HasMany(r => r.RolePermissions)
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleID);
-    }
 
+        // Decimal precision and scale configuration
+        modelBuilder.Entity<Address>()
+            .Property(a => a.Latitude)
+            .HasColumnType("decimal(18, 10)");
+
+        modelBuilder.Entity<Address>()
+            .Property(a => a.Longitude)
+            .HasColumnType("decimal(18, 10)");
+
+        modelBuilder.Entity<MenuItem>()
+            .Property(mi => mi.Discount)
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<MenuItem>()
+            .Property(mi => mi.Price)
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<Perk>()
+            .Property(p => p.MaxDiscountAmount)
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<Perk>()
+            .Property(p => p.MinPurchaseAmount)
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<Perk>()
+            .Property(p => p.Value)
+            .HasColumnType("decimal(18, 2)");
+    }
     public override int SaveChanges()
     {
         // Custom logic here, if needed

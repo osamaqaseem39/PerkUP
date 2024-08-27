@@ -4,10 +4,19 @@ import api from '../../api';
 
 interface Address {
   addressID: number;
+  name: string;
   street: string;
-  cityID: number;
   areaID: number;
+  cityID: number;
+  state: string;
+  postalCode: string;
   countryID: number;
+  latitude: number;
+  longitude: number;
+  createdBy: number;
+  createdAt: string;
+  updatedBy: number;
+  updatedAt: string;
 }
 
 interface Country {
@@ -27,10 +36,19 @@ interface Area {
 
 const initialFormData: Address = {
   addressID: 0,
+  name: '',
   street: '',
-  cityID: 0,
   areaID: 0,
+  cityID: 0,
+  state: '',
+  postalCode: '',
   countryID: 0,
+  latitude: 0,
+  longitude: 0,
+  createdBy: 0,
+  createdAt: new Date().toISOString(),
+  updatedBy: 0,
+  updatedAt: new Date().toISOString(),
 };
 
 const AddressForm = ({ addressID }: { addressID?: number | null }) => {
@@ -41,6 +59,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const navigate = useNavigate();
 
+  // Fetch address data if addressID is provided
   useEffect(() => {
     const fetchAddress = async () => {
       if (addressID !== null && addressID !== undefined) {
@@ -53,6 +72,11 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
       }
     };
 
+    fetchAddress();
+  }, [addressID]);
+
+  // Fetch countries
+  useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await api.get('/Countries');
@@ -62,10 +86,10 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
       }
     };
 
-    fetchAddress();
     fetchCountries();
-  }, [addressID]);
+  }, []);
 
+  // Fetch cities based on selected country
   useEffect(() => {
     const fetchCities = async () => {
       if (formData.countryID) {
@@ -83,6 +107,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     fetchCities();
   }, [formData.countryID]);
 
+  // Fetch areas based on selected city
   useEffect(() => {
     const fetchAreas = async () => {
       if (formData.cityID) {
@@ -104,7 +129,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: parseInt(value, 10),
+      [name]: name === 'latitude' || name === 'longitude' ? parseFloat(value) : value,
     });
   };
 
@@ -158,6 +183,21 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5.5 p-6.5">
         <div>
+          <label htmlFor="name" className="mb-3 block text-black dark:text-white">
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          />
+        </div>
+
+        <div>
           <label htmlFor="street" className="mb-3 block text-black dark:text-white">
             Street
           </label>
@@ -166,7 +206,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             id="street"
             name="street"
             value={formData.street}
-            onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+            onChange={handleChange}
             required
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
@@ -190,6 +230,26 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
                 {country.countryName}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="state" className="mb-3 block text-black dark:text-white">
+            State
+          </label>
+          <select
+            id="state"
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          >
+            <option value="">Select a state</option>
+            <option value="Punjab">Punjab</option>
+            <option value="Sindh">Sindh</option>
+            <option value="Balochistan">Balochistan</option>
+            <option value="KPK">KPK</option>
           </select>
         </div>
 
@@ -235,12 +295,61 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
           </select>
         </div>
 
-        <button
-          type="submit"
-          className="bg-primary text-white py-3 px-6 rounded-lg mt-6 mx-auto hover:bg-opacity-90 focus:outline-none"
-        >
-          {addressID ? 'Update Address' : 'Create Address'}
-        </button>
+        <div>
+          <label htmlFor="postalCode" className="mb-3 block text-black dark:text-white">
+            Postal Code
+          </label>
+          <input
+            type="text"
+            id="postalCode"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="latitude" className="mb-3 block text-black dark:text-white">
+            Latitude
+          </label>
+          <input
+            type="number"
+            step="0.000001"
+            id="latitude"
+            name="latitude"
+            value={formData.latitude}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="longitude" className="mb-3 block text-black dark:text-white">
+            Longitude
+          </label>
+          <input
+            type="number"
+            step="0.000001"
+            id="longitude"
+            name="longitude"
+            value={formData.longitude}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          />
+        </div>
+
+        <div className="flex justify-between">
+          <button
+            type="submit"
+            className="w-full rounded-lg border border-primary bg-primary py-3 px-5 text-base font-medium text-white transition hover:bg-opacity-90"
+          >
+            {addressID ? 'Update Address' : 'Create Address'}
+          </button>
+        </div>
       </form>
     </div>
   );
