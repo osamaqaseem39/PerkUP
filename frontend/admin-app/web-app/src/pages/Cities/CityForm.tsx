@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 
 
@@ -14,7 +14,9 @@ const initialFormData: City = {
   cityName: '',
 };
 
-const CityForm = ({ cityID }: { cityID?: number | null }) => {
+const CityForm = () => {
+  const { id } = useParams();
+
   const [formData, setFormData] = useState<City>(initialFormData);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const navigate = useNavigate();
@@ -22,9 +24,9 @@ const CityForm = ({ cityID }: { cityID?: number | null }) => {
   useEffect(() => {
  
     const fetchCity = async () => {
-      if (cityID !== null && cityID !== undefined) {
+      if (id !== null && id !== undefined) {
         try {
-          const response = await api.get(`/Cities/${cityID}`);
+          const response = await api.get(`/Cities/${id}`);
           setFormData(response.data);
         } catch (error) {
           console.error('Error fetching city data:', error);
@@ -33,7 +35,7 @@ const CityForm = ({ cityID }: { cityID?: number | null }) => {
     };
 
     fetchCity();
-  }, [cityID]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -47,7 +49,7 @@ const CityForm = ({ cityID }: { cityID?: number | null }) => {
     e.preventDefault();
 
     try {
-      if (cityID !== null && cityID !== undefined) {
+      if (id !== null && id !== undefined) {
         // Update existing city
         await api.put(`/Cities/${formData.cityID}`, formData);
         setAlert({ type: 'success', message: 'City updated successfully!' });
@@ -75,7 +77,7 @@ const CityForm = ({ cityID }: { cityID?: number | null }) => {
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark flex justify-between items-center">
         <h3 className="font-medium text-black dark:text-white">
-          {cityID ? 'Update City' : 'Create City'}
+          {id ? 'Update City' : 'Create City'}
         </h3>
         <button
           onClick={handleBackClick}
@@ -112,7 +114,7 @@ const CityForm = ({ cityID }: { cityID?: number | null }) => {
           type="submit"
           className="bg-primary text-white py-3 px-6 rounded-lg mt-6 mx-auto hover:bg-opacity-90 focus:outline-none"
         >
-          {cityID ? 'Update City' : 'Create City'}
+          {id ? 'Update City' : 'Create City'}
         </button>
       </form>
     </div>

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace adminAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240826114805_menu")]
-    partial class menu
+    [Migration("20240828105041_new")]
+    partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,14 +31,14 @@ namespace adminAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressID"), 1L, 1);
 
-                    b.Property<string>("Area")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AreaID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CityID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CountryID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -47,10 +47,10 @@ namespace adminAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,10)");
 
                     b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,10)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -211,6 +211,9 @@ namespace adminAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemID"), 1L, 1);
 
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -249,6 +252,8 @@ namespace adminAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MenuItemID");
+
+                    b.HasIndex("MenuID");
 
                     b.ToTable("MenuItems");
                 });
@@ -315,9 +320,6 @@ namespace adminAPI.Migrations
                     b.Property<int>("PermissionID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PermissionID1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -329,8 +331,6 @@ namespace adminAPI.Migrations
                     b.HasIndex("ModuleID");
 
                     b.HasIndex("PermissionID");
-
-                    b.HasIndex("PermissionID1");
 
                     b.ToTable("ModulePermissions");
                 });
@@ -601,6 +601,17 @@ namespace adminAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("MenuItem", b =>
+                {
+                    b.HasOne("Menu", "Menu")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("MenuID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+                });
+
             modelBuilder.Entity("ModulePermission", b =>
                 {
                     b.HasOne("Module", "Module")
@@ -610,14 +621,10 @@ namespace adminAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("Permission", "Permission")
-                        .WithMany()
+                        .WithMany("ModulePermissions")
                         .HasForeignKey("PermissionID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Permission", null)
-                        .WithMany("ModulePermissions")
-                        .HasForeignKey("PermissionID1");
 
                     b.Navigation("Module");
 
@@ -658,6 +665,11 @@ namespace adminAPI.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Menu", b =>
+                {
+                    b.Navigation("MenuItems");
                 });
 
             modelBuilder.Entity("Module", b =>

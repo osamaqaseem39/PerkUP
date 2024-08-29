@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 
 
@@ -13,7 +13,8 @@ const initialFormData: Country = {
   countryName: '',
 };
 
-const CountryForm = ({ countryID }: { countryID?: number | null }) => {
+const CountryForm = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState<Country>(initialFormData);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const navigate = useNavigate();
@@ -21,9 +22,9 @@ const CountryForm = ({ countryID }: { countryID?: number | null }) => {
   useEffect(() => {
  
     const fetchCountry = async () => {
-      if (countryID !== null && countryID !== undefined) {
+      if (id !== null && id !== undefined) {
         try {
-          const response = await api.get(`/Countries/${countryID}`);
+          const response = await api.get(`/Countries/${id}`);
           setFormData(response.data);
         } catch (error) {
           console.error('Error fetching country data:', error);
@@ -32,7 +33,7 @@ const CountryForm = ({ countryID }: { countryID?: number | null }) => {
     };
 
     fetchCountry();
-  }, [countryID]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,7 +47,7 @@ const CountryForm = ({ countryID }: { countryID?: number | null }) => {
     e.preventDefault();
 
     try {
-      if (countryID !== null && countryID !== undefined) {
+      if (id !== null && id !== undefined) {
         // Update existing country
         await api.put(`/Countries/${formData.countryID}`, formData);
         setAlert({ type: 'success', message: 'Country updated successfully!' });
@@ -74,7 +75,7 @@ const CountryForm = ({ countryID }: { countryID?: number | null }) => {
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark flex justify-between items-center">
         <h3 className="font-medium text-black dark:text-white">
-          {countryID ? 'Update Country' : 'Create Country'}
+          {id ? 'Update Country' : 'Create Country'}
         </h3>
         <button
           onClick={handleBackClick}
@@ -111,7 +112,7 @@ const CountryForm = ({ countryID }: { countryID?: number | null }) => {
           type="submit"
           className="bg-primary text-white py-3 px-6 rounded-lg mt-6 mx-auto hover:bg-opacountry-90 focus:outline-none"
         >
-          {countryID ? 'Update Country' : 'Create Country'}
+          {id ? 'Update Country' : 'Create Country'}
         </button>
       </form>
     </div>

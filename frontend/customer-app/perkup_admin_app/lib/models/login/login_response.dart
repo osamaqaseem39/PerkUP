@@ -31,8 +31,7 @@ class LoginResponse {
       await prefs.setString('bearerToken', loginResponse.bearerToken);
       await prefs.setString('token', loginResponse.token);
     } catch (e) {
-      print('Error saving to preferences: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -55,7 +54,9 @@ class LoginResponse {
         token: token,
       );
     } catch (e) {
+      // ignore: avoid_print
       print('Error loading from preferences: $e');
+      // ignore: use_rethrow_when_possible
       throw e;
     }
   }
@@ -67,7 +68,9 @@ class LoginResponse {
       await prefs.remove('bearerToken');
       await prefs.remove('token');
     } catch (e) {
+      // ignore: avoid_print
       print('Error clearing preferences: $e');
+      // ignore: use_rethrow_when_possible
       throw e;
     }
   }

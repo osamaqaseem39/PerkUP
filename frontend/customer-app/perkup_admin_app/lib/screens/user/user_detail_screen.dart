@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_user_app/providers/user_provider.dart';
-import 'package:perkup_user_app/providers/login_provider.dart';
+
 import 'package:perkup_user_app/screens/user/user_form_screen.dart';
 
 class UserDetailScreen extends StatelessWidget {
@@ -11,7 +11,6 @@ class UserDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final token = Provider.of<LoginProvider>(context, listen: false).token;
     final user = userProvider.users.firstWhere((usr) => usr.userID == userID);
 
     return Scaffold(

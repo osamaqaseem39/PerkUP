@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perkup_user_app/providers/country_provider.dart';
+import 'package:perkup_user_app/providers/menu_provider.dart';
 import 'package:perkup_user_app/providers/perk_provider.dart';
 import 'package:perkup_user_app/providers/perktype_provider.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => AreaProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => PerkTypeProvider()),
-        ChangeNotifierProvider(create: (_) => PerkProvider())
+        ChangeNotifierProvider(create: (_) => PerkProvider()),
+        ChangeNotifierProvider(create: (_) => MenuProvider())
       ],
       child: const MyApp(),
     ),

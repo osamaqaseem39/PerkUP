@@ -5,12 +5,10 @@ import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
 import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
-import Calendar from './pages/Calendar';
+
 import Chart from './pages/Chart';
-import ECommerce from './pages/Dashboard/ECommerce';
 import FormElements from './pages/Form/FormElements';
 import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
@@ -22,6 +20,16 @@ import CityForm from './pages/Cities/CityForm';
 import CityList from './pages/Cities/CityList';
 import AreaForm from './pages/Areas/AreaForm';
 import AreaList from './pages/Areas/AreaList';
+
+import PerkList from './pages/Perks/PerkList';
+import PerkTypeList from './pages/Perks/PerkTypeList';
+import PerkForm from './pages/Perks/PerkForm';
+import PerkTypeForm from './pages/Perks/PerkTypeForm';
+
+import UserForm from './pages/Users/UserForm';
+import UserList from './pages/Users/UserList';
+import MenuForm from './pages/Menus/MenuForm';
+import MenuList from './pages/Menus/MenuList';
 
 import AddressForm from './pages/Addresses/AddressForm';
 import AddressList from './pages/Addresses/AddressList';
@@ -47,7 +55,7 @@ function App() {
         path="/"
         element={
           <>
-            <PageTitle title="Signin | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Signin | PerkUP " />
             <SignIn />
           </>
         }
@@ -56,37 +64,101 @@ function App() {
         path="/auth/signup"
         element={
           <>
-            <PageTitle title="Signup | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Signup | PerkUP " />
             <SignUp />
           </>
         }
       />
 
       {/* Dashboard Routes */}
-      <Route
-        path="/dashboard"
+   
+        <Route
+        path="/perktypeform/:id"
         element={
           <DefaultLayout>
-            <PageTitle title="Dashboard" />
-            <ECommerce />
+            <PageTitle title="Perk Type Form" />
+            <PerkTypeForm />
+          </DefaultLayout>
+        }
+      />
+        <Route
+        path="/perkform/:id"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Perk Form" />
+            <PerkForm />
+          </DefaultLayout>
+        }
+      />
+          <Route
+        path="/perktypeform"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Perk Type Form" />
+            <PerkTypeForm />
+          </DefaultLayout>
+        }
+      />
+        <Route
+        path="/perkform"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Perk Form" />
+            <PerkForm />
           </DefaultLayout>
         }
       />
       <Route
-        path="/calendar"
+        path="/perktype"
         element={
           <DefaultLayout>
-            <PageTitle title="Calendar" />
-            <Calendar />
+            <PageTitle title="Perk Type List" />
+            <PerkTypeList />
           </DefaultLayout>
         }
       />
       <Route
-        path="/profile"
+        path="/perk"
         element={
           <DefaultLayout>
-            <PageTitle title="Profile | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-            <Profile />
+            <PageTitle title="Perk List" />
+            <PerkList />
+          </DefaultLayout>
+        }
+      />
+        <Route
+        path="/menu"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Menu List" />
+            <MenuList />
+          </DefaultLayout>
+        }
+      />
+         <Route
+        path="/menuform/:id"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Menu Form" />
+            <MenuForm />
+          </DefaultLayout>
+        }
+      />
+          <Route
+        path="/menuform"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Menu Form" />
+            <MenuForm />
+          </DefaultLayout>
+        }
+      />
+       <Route
+        path="/countryform/:id"
+        element={
+          <DefaultLayout>
+            <PageTitle title="Country Form" />
+            <CountryForm />
           </DefaultLayout>
         }
       />
@@ -109,6 +181,15 @@ function App() {
         }
       />
       <Route
+      path="/cityform/:id"
+      element={
+        <DefaultLayout>
+          <PageTitle title="City Form" />
+          <CityForm/>
+        </DefaultLayout>
+      }
+    />
+     <Route
       path="/cityform"
       element={
         <DefaultLayout>
@@ -127,6 +208,15 @@ function App() {
       }
     />
       <Route
+      path="/areaform/:id"
+      element={
+        <DefaultLayout>
+          <PageTitle title="Area Form" />
+          <AreaForm/>
+        </DefaultLayout>
+      }
+    />
+        <Route
       path="/areaform"
       element={
         <DefaultLayout>
@@ -141,6 +231,15 @@ function App() {
         <DefaultLayout>
           <PageTitle title="Area" />
           <AreaList/>
+        </DefaultLayout>
+      }
+    />
+      <Route
+      path="/addressform/:id"
+      element={
+        <DefaultLayout>
+          <PageTitle title="Address Form" />
+          <AddressForm/>
         </DefaultLayout>
       }
     />
@@ -162,12 +261,39 @@ function App() {
         </DefaultLayout>
       }
     />
+     <Route
+      path="/user"
+      element={
+        <DefaultLayout>
+          <PageTitle title="User" />
+          <UserList/>
+        </DefaultLayout>
+      }
+    />
+         <Route
+      path="/userform/:id"
+      element={
+        <DefaultLayout>
+          <PageTitle title="User" />
+          <UserForm/>
+        </DefaultLayout>
+      }
+    />
+         <Route
+      path="/userform"
+      element={
+        <DefaultLayout>
+          <PageTitle title="User" />
+          <UserForm/>
+        </DefaultLayout>
+      }
+    />
       <Route
       
         path="/forms/form-elements"
         element={
           <DefaultLayout>
-            <PageTitle title="Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Form Elements | PerkUP " />
             <FormElements />
           </DefaultLayout>
         }
@@ -176,7 +302,7 @@ function App() {
         path="/forms/form-layout"
         element={
           <DefaultLayout>
-            <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Form Layout | PerkUP " />
             <FormLayout />
           </DefaultLayout>
         }
@@ -185,7 +311,7 @@ function App() {
         path="/tables"
         element={ 
           <DefaultLayout>
-            <PageTitle title="Tables | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Tables | PerkUP " />
             <Tables />
           </DefaultLayout>
         }
@@ -194,7 +320,7 @@ function App() {
         path="/settings"
         element={
           <DefaultLayout>
-            <PageTitle title="Settings | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Settings | PerkUP " />
             <Settings />
           </DefaultLayout>
         }
@@ -203,7 +329,7 @@ function App() {
         path="/chart"
         element={
           <DefaultLayout>
-            <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Basic Chart | PerkUP " />
             <Chart />
           </DefaultLayout>
         }
@@ -212,7 +338,7 @@ function App() {
         path="/ui/alerts"
         element={
           <DefaultLayout>
-            <PageTitle title="Alerts | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Alerts | PerkUP " />
             <Alerts />
           </DefaultLayout>
         }
@@ -221,7 +347,7 @@ function App() {
         path="/ui/buttons"
         element={
           <DefaultLayout>
-            <PageTitle title="Buttons | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <PageTitle title="Buttons | PerkUP " />
             <Buttons />
           </DefaultLayout>
         }

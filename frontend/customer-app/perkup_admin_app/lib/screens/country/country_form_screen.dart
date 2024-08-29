@@ -74,6 +74,7 @@ class _CountryFormScreenState extends State<CountryFormScreen> {
                     } else {
                       countryProvider.updateCountry(country, token!);
                     }
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
                 },

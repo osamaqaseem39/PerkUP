@@ -30,10 +30,11 @@ public class AuthController : ControllerBase
             string passwordHash;
             int roleId;
             int userId;
+            string displayName;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("SELECT UserId, Password, RoleId FROM Users WHERE Username = @Username", connection);
+                SqlCommand command = new SqlCommand("SELECT UserId, Password, RoleId, DisplayName FROM Users WHERE Username = @Username", connection);
                 command.Parameters.AddWithValue("@Username", loginRequest.Username);
 
                 await connection.OpenAsync();
@@ -44,6 +45,7 @@ public class AuthController : ControllerBase
                     userId = Convert.ToInt32(reader["UserId"]);
                     passwordHash = reader["Password"].ToString();
                     roleId = Convert.ToInt32(reader["RoleId"]);
+                    displayName = reader["DisplayName"].ToString();
                 }
                 else
                 {
@@ -71,7 +73,8 @@ public class AuthController : ControllerBase
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var bearerTokenString = "Bearer " + tokenHandler.WriteToken(token);
             var tokenString = tokenHandler.WriteToken(token);
-            return Ok(new { UserId = userId, BearerToken = bearerTokenString , Token= tokenString});
+
+            return Ok(new { UserId = userId, DisplayName = displayName, BearerToken = bearerTokenString, Token = tokenString });
         }
         catch (Exception ex)
         {

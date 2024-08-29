@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace adminAPI.Migrations
 {
-    public partial class menu : Migration
+    public partial class @new : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,13 +17,13 @@ namespace adminAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Area = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AreaID = table.Column<int>(type: "int", nullable: true),
+                    CityID = table.Column<int>(type: "int", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    CountryID = table.Column<int>(type: "int", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(18,10)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,10)", nullable: true),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<int>(type: "int", nullable: false),
@@ -85,30 +85,6 @@ namespace adminAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Countries", x => x.CountryID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MenuItems",
-                columns: table => new
-                {
-                    MenuItemID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MenuID = table.Column<int>(type: "int", nullable: false),
-                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    IsPercentageDiscount = table.Column<bool>(type: "bit", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MenuItems", x => x.MenuItemID);
                 });
 
             migrationBuilder.CreateTable(
@@ -231,6 +207,37 @@ namespace adminAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MenuItems",
+                columns: table => new
+                {
+                    MenuItemID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MenuID = table.Column<int>(type: "int", nullable: false),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IsPercentageDiscount = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItems", x => x.MenuItemID);
+                    table.ForeignKey(
+                        name: "FK_MenuItems_Menus_MenuID",
+                        column: x => x.MenuID,
+                        principalTable: "Menus",
+                        principalColumn: "MenuID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ModulePermissions",
                 columns: table => new
                 {
@@ -243,8 +250,7 @@ namespace adminAPI.Migrations
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<int>(type: "int", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PermissionID1 = table.Column<int>(type: "int", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -261,11 +267,6 @@ namespace adminAPI.Migrations
                         principalTable: "Permissions",
                         principalColumn: "PermissionID",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ModulePermissions_Permissions_PermissionID1",
-                        column: x => x.PermissionID1,
-                        principalTable: "Permissions",
-                        principalColumn: "PermissionID");
                 });
 
             migrationBuilder.CreateTable(
@@ -342,6 +343,11 @@ namespace adminAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_MenuID",
+                table: "MenuItems",
+                column: "MenuID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ModulePermissions_ModuleID",
                 table: "ModulePermissions",
                 column: "ModuleID");
@@ -350,11 +356,6 @@ namespace adminAPI.Migrations
                 name: "IX_ModulePermissions_PermissionID",
                 table: "ModulePermissions",
                 column: "PermissionID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ModulePermissions_PermissionID1",
-                table: "ModulePermissions",
-                column: "PermissionID1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionID",
@@ -394,9 +395,6 @@ namespace adminAPI.Migrations
                 name: "MenuItems");
 
             migrationBuilder.DropTable(
-                name: "Menus");
-
-            migrationBuilder.DropTable(
                 name: "ModulePermissions");
 
             migrationBuilder.DropTable(
@@ -410,6 +408,9 @@ namespace adminAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Menus");
 
             migrationBuilder.DropTable(
                 name: "Modules");

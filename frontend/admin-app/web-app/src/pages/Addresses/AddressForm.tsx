@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 
 interface Address {
@@ -51,7 +52,8 @@ const initialFormData: Partial<Address> = {
   updatedAt: new Date().toISOString(),
 };
 
-const AddressForm = ({ addressID }: { addressID?: number | null }) => {
+const AddressForm = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState<Partial<Address>>(initialFormData);
   const [countries, setCountries] = useState<Country[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -61,15 +63,19 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
 
   useEffect(() => {
     const fetchAddress = async () => {
-      if (addressID !== null && addressID !== undefined) {
+      if (id) {
         try {
-          const response = await api.get(`/Addresses/${addressID}`);
+          const response = await api.get(`/Addresses/${id}`);
           const addressData = response.data;
           setFormData(addressData);
 
           // Fetch cities and areas based on IDs
-          fetchCities(addressData.countryID);
-          fetchAreas(addressData.cityID);
+          if (addressData.countryID) {
+            fetchCities(addressData.countryID);
+          }
+          if (addressData.cityID) {
+            fetchAreas(addressData.cityID);
+          }
         } catch (error) {
           console.error('Error fetching address data:', error);
         }
@@ -77,7 +83,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     };
 
     fetchAddress();
-  }, [addressID]);
+  }, [id]);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -130,12 +136,14 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     const selectedCountryID = Number(e.target.value);
     setFormData({ ...formData, countryID: selectedCountryID });
     fetchCities(selectedCountryID);
+    setFormData({ ...formData, cityID: 0, areaID: 0 }); // Reset city and area when country changes
   };
 
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCityID = Number(e.target.value);
     setFormData({ ...formData, cityID: selectedCityID });
     fetchAreas(selectedCityID);
+    setFormData({ ...formData, areaID: 0 }); // Reset area when city changes
   };
 
   const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -146,7 +154,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (addressID !== null && addressID !== undefined) {
+      if (id) {
         await api.put(`/Addresses/${formData.addressID}`, formData);
         setAlert({ type: 'success', message: 'Address updated successfully!' });
       } else {
@@ -171,7 +179,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark flex justify-between items-center">
         <h3 className="font-medium text-black dark:text-white">
-          {addressID ? 'Update Address' : 'Create Address'}
+          {id ? 'Update Address' : 'Create Address'}
         </h3>
         <button
           onClick={handleBackClick}
@@ -203,8 +211,6 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
           />
         </div>
 
-       
-
         <div>
           <label htmlFor="countryName" className="mb-3 block text-black dark:text-white">
             Country
@@ -225,6 +231,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             ))}
           </select>
         </div>
+
         <div>
           <label htmlFor="state" className="mb-3 block text-black dark:text-white">
             State
@@ -244,6 +251,7 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             <option value="KPK">KPK</option>
           </select>
         </div>
+
         <div>
           <label htmlFor="cityName" className="mb-3 block text-black dark:text-white">
             City
@@ -315,7 +323,6 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div>
           <label htmlFor="latitude" className="mb-3 block text-black dark:text-white">
             Latitude
@@ -344,79 +351,22 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
           />
         </div>
 
-        {addressID && (
-          <>
-            <div>
-              <label htmlFor="createdBy" className="mb-3 block text-black dark:text-white">
-                Created By
-              </label>
-              <input
-                type="text"
-                id="createdBy"
-                name="createdBy"
-                value={formData.createdBy || ''}
-                readOnly
-                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
-              />
-            </div>
+      
 
-            <div>
-              <label htmlFor="createdAt" className="mb-3 block text-black dark:text-white">
-                Created At
-              </label>
-              <input
-                type="text"
-                id="createdAt"
-                name="createdAt"
-                value={formData.createdAt || ''}
-                readOnly
-                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
-              />
-            </div>
 
-            <div>
-              <label htmlFor="updatedBy" className="mb-3 block text-black dark:text-white">
-                Updated By
-              </label>
-              <input
-                type="text"
-                id="updatedBy"
-                name="updatedBy"
-                value={formData.updatedBy || ''}
-                readOnly
-                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="updatedAt" className="mb-3 block text-black dark:text-white">
-                Updated At
-              </label>
-              <input
-                type="text"
-                id="updatedAt"
-                name="updatedAt"
-                value={formData.updatedAt || ''}
-                readOnly
-                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition dark:border-form-strokedark dark:bg-form-input dark:text-white"
-              />
-            </div>
-          </>
-        )}
-
-        <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-90"
-          >
-            {addressID ? 'Update Address' : 'Create Address'}
-          </button>
+        <div className="flex justify-end gap-4">
           <button
             type="button"
             onClick={handleBackClick}
             className="bg-secondary text-white py-2 px-4 rounded-lg hover:bg-opacity-90"
           >
             Back
+          </button>
+          <button
+            type="submit"
+            className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-90"
+          >
+            {id ? 'Update Address' : 'Create Address'}
           </button>
         </div>
       </form>
@@ -425,3 +375,4 @@ const AddressForm = ({ addressID }: { addressID?: number | null }) => {
 };
 
 export default AddressForm;
+

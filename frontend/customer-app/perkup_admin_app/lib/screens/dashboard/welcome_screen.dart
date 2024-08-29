@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_user_app/screens/menu/menu_list_screen.dart';
 import 'package:perkup_user_app/screens/perk/perk_list_screen.dart';
 import 'package:perkup_user_app/screens/perktype/perktype_list_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  WelcomeScreen({super.key}); // Remove `const` here
+  WelcomeScreen({super.key}); // Removed `const` here if required
 
   final List<Map<String, dynamic>> _actions = [
     {
@@ -16,13 +17,21 @@ class WelcomeScreen extends StatelessWidget {
       'label': 'Manage Perk',
       'screen': const PerkListScreen(),
     },
+    {
+      'icon': Icons.handshake,
+      'label': 'Manage Menu',
+      'screen': const MenuListScreen(),
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Welcome to Admin App'),
+        title: const Text(
+          'Welcome to Vendor App',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.blue,
       ),
       body: Padding(
@@ -50,10 +59,10 @@ class WelcomeScreen extends StatelessWidget {
                 style: const TextStyle(color: Colors.white),
               ),
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-                fixedSize: WidgetStateProperty.all<Size>(const Size(200, 80)),
-                elevation: WidgetStateProperty.all<double>(3),
-                shape: WidgetStateProperty.all<OutlinedBorder>(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                fixedSize: MaterialStateProperty.all<Size>(const Size(200, 80)),
+                elevation: MaterialStateProperty.all<double>(3),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

@@ -1,59 +1,73 @@
 class MenuItem {
+  final int menuItemID;
+  final int menuID;
+  final String itemName;
+  final String? description;
+  final String? image;
+  final double price;
+  final double discount;
+  final bool isPercentageDiscount;
+  final bool isActive;
+  final String? category;
+  final int createdBy;
+  final DateTime createdAt;
+  final int updatedBy;
+  final DateTime updatedAt;
+
   MenuItem({
     required this.menuItemID,
     required this.menuID,
     required this.itemName,
     this.description,
-    this.price,
     this.image,
+    required this.price,
+    required this.discount,
+    required this.isPercentageDiscount,
     required this.isActive,
+    this.category,
     required this.createdBy,
     required this.createdAt,
     required this.updatedBy,
     required this.updatedAt,
   });
 
-  late final int menuItemID;
-  late final int menuID;
-  late final String itemName;
-  String? description;
-  double? price;
-  String? image;
-  late final bool isActive;
-  late final int createdBy;
-  late final String createdAt;
-  late final int updatedBy;
-  late final String updatedAt;
-
-  // Create a MenuItem from JSON
-  MenuItem.fromJson(Map<String, dynamic> json) {
-    menuItemID = json['menuItemID'];
-    menuID = json['menuID'];
-    itemName = json['itemName'];
-    description = json['description'];
-    price = json['price'];
-    image = json['image'];
-    isActive = json['isActive'];
-    createdBy = json['createdBy'];
-    createdAt = json['createdAt'];
-    updatedBy = json['updatedBy'];
-    updatedAt = json['updatedAt'];
+  // Factory constructor for creating a new MenuItem instance from a map
+  factory MenuItem.fromJson(Map<String, dynamic> json) {
+    return MenuItem(
+      menuItemID: json['menuItemID'],
+      menuID: json['menuID'],
+      itemName: json['itemName'],
+      description: json['description'],
+      image: json['image'],
+      price: json['price'].toDouble(),
+      discount: json['discount'].toDouble(),
+      isPercentageDiscount: json['isPercentageDiscount'],
+      isActive: json['isActive'],
+      category: json['category'],
+      createdBy: json['createdBy'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedBy: json['updatedBy'],
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
   }
 
-  // Convert a MenuItem to JSON
+  // Method to convert a MenuItem instance to a map
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['menuItemID'] = menuItemID;
-    data['menuID'] = menuID;
-    data['itemName'] = itemName;
-    data['description'] = description;
-    data['price'] = price;
-    data['image'] = image;
-    data['isActive'] = isActive;
-    data['createdBy'] = createdBy;
-    data['createdAt'] = createdAt;
-    data['updatedBy'] = updatedBy;
-    data['updatedAt'] = updatedAt;
-    return data;
+    return {
+      'menuItemID': menuItemID,
+      'menuID': menuID,
+      'itemName': itemName,
+      'description': description,
+      'image': image,
+      'price': price,
+      'discount': discount,
+      'isPercentageDiscount': isPercentageDiscount,
+      'isActive': isActive,
+      'category': category,
+      'createdBy': createdBy,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedBy': updatedBy,
+      'updatedAt': updatedAt.toIso8601String(),
+    };
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 
 
@@ -13,7 +13,9 @@ const initialFormData: Area = {
   areaName: '',
 };
 
-const AreaForm = ({ areaID }: { areaID?: number | null }) => {
+const AreaForm = () => {
+  
+  const { id } = useParams();
   const [formData, setFormData] = useState<Area>(initialFormData);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const navigate = useNavigate();
@@ -21,9 +23,9 @@ const AreaForm = ({ areaID }: { areaID?: number | null }) => {
   useEffect(() => {
  
     const fetchArea = async () => {
-      if (areaID !== null && areaID !== undefined) {
+      if (id !== null && id !== undefined) {
         try {
-          const response = await api.get(`/Areas/${areaID}`);
+          const response = await api.get(`/Areas/${id}`);
           setFormData(response.data);
         } catch (error) {
           console.error('Error fetching area data:', error);
@@ -32,7 +34,7 @@ const AreaForm = ({ areaID }: { areaID?: number | null }) => {
     };
 
     fetchArea();
-  }, [areaID]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,7 +48,7 @@ const AreaForm = ({ areaID }: { areaID?: number | null }) => {
     e.preventDefault();
 
     try {
-      if (areaID !== null && areaID !== undefined) {
+      if (id !== null && id !== undefined) {
         // Update existing area
         await api.put(`/Areas/${formData.areaID}`, formData);
         setAlert({ type: 'success', message: 'Area updated successfully!' });
@@ -74,7 +76,7 @@ const AreaForm = ({ areaID }: { areaID?: number | null }) => {
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark flex justify-between items-center">
         <h3 className="font-medium text-black dark:text-white">
-          {areaID ? 'Update Area' : 'Create Area'}
+          {id ? 'Update Area' : 'Create Area'}
         </h3>
         <button
           onClick={handleBackClick}
@@ -111,7 +113,7 @@ const AreaForm = ({ areaID }: { areaID?: number | null }) => {
           type="submit"
           className="bg-primary text-white py-3 px-6 rounded-lg mt-6 mx-auto hover:bg-opaarea-90 focus:outline-none"
         >
-          {areaID ? 'Update Area' : 'Create Area'}
+          {id ? 'Update Area' : 'Create Area'}
         </button>
       </form>
     </div>

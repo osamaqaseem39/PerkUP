@@ -4,8 +4,8 @@ import api from '../../api';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
 interface Address {
-  AddressID: number;
-  AddressName: string;
+  addressID: number;
+  name: string;
 }
 
 const AddressList = () => {
@@ -45,7 +45,7 @@ const AddressList = () => {
     if (addressToDelete !== null) {
       try {
         await api.delete(`/Addresses/${addressToDelete}`);
-        setAddresses((prevAddresses) => prevAddresses.filter((address) => address.AddressID !== addressToDelete));
+        setAddresses((prevAddresses) => prevAddresses.filter((address) => address.addressID !== addressToDelete));
       } catch (error) {
         console.error('Error deleting address:', error);
       } finally {
@@ -76,15 +76,15 @@ const AddressList = () => {
           </thead>
           <tbody>
             {addresses.map((address) => (
-              <tr key={address.AddressID}>
+              <tr key={address.addressID}>
                 <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-                  <h5 className="font-medium text-black dark:text-white">{address.AddressName}</h5>
+                  <h5 className="font-medium text-black dark:text-white">{address.name}</h5>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
                     <button
                       className="hover:text-primary"
-                      onClick={() => handleEditClick(address.AddressID)}
+                      onClick={() => handleEditClick(address.addressID)}
                     >
                       <svg
                         className="fill-current"
@@ -104,7 +104,7 @@ const AddressList = () => {
                     </button>
                     <button
                       className="hover:text-primary"
-                      onClick={() => handleDeleteClick(address.AddressID)}
+                      onClick={() => handleDeleteClick(address.addressID)}
                     >
                       <svg
                         className="fill-current"
