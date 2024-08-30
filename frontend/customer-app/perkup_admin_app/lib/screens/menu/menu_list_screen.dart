@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_user_app/models/menu/menu.dart';
+import 'package:perkup_user_app/screens/menu/menu_form_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_user_app/providers/login_provider.dart';
 import 'package:perkup_user_app/providers/menu_provider.dart';
-import 'package:perkup_user_app/screens/menu_form_screen.dart'; // Import the MenuFormScreen
+// Ensure this path is correct
 
 class MenuListScreen extends StatefulWidget {
   const MenuListScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MenuListScreenState createState() => _MenuListScreenState();
 }
 
@@ -21,34 +24,18 @@ class _MenuListScreenState extends State<MenuListScreen> {
   Future<void> _loadMenus() async {
     final menuProvider = Provider.of<MenuProvider>(context, listen: false);
     final token = Provider.of<LoginProvider>(context, listen: false).token;
-    await menuProvider.fetchMenus(token!);
+
+    if (token != null) {
+      await menuProvider.fetchMenus(token);
+    } else {
+      // Handle the case when token is null (e.g., navigate to login screen or show an error)
+      menuProvider.setErrorMessage('Token not found. Please log in again.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final menuProvider = Provider.of<MenuProvider>(context);
-
-    if (menuProvider.isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Menus'),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (menuProvider.errorMessage != null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Menus'),
-        ),
-        body: Center(
-          child: Text('Error: ${menuProvider.errorMessage}'),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -56,40 +43,65 @@ class _MenuListScreenState extends State<MenuListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const MenuFormScreen(), // Navigate to MenuFormScreen
-                ),
-              );
-            },
+            onPressed: () => _navigateToMenuFormScreen(context),
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: menuProvider.menus.length,
-        itemBuilder: (context, index) {
-          final menu = menuProvider.menus[index];
-          return ListTile(
-            // ignore: unnecessary_null_comparison
-            leading: menu.image != null && menu.image!.isNotEmpty
-                ? Image.network(menu.image,
-                    width: 50, height: 50, fit: BoxFit.cover)
-                : const Icon(Icons.fastfood, size: 50),
-            title: Text(menu.menuName),
-            subtitle: Text(menu.description ?? 'No description'),
-            trailing: const Icon(Icons.edit),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MenuFormScreen(
-                      menu: menu), // Pass the menu to MenuFormScreen
-                ),
-              );
-            },
-          );
-        },
+      body: _buildBody(menuProvider),
+    );
+  }
+
+  Widget _buildBody(MenuProvider menuProvider) {
+    if (menuProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (menuProvider.errorMessage != null) {
+      return Center(child: Text('Error: ${menuProvider.errorMessage}'));
+    }
+
+    if (menuProvider.menus.isEmpty) {
+      return const Center(child: Text('No menus available.'));
+    }
+
+    return ListView.builder(
+      itemCount: menuProvider.menus.length,
+      itemBuilder: (context, index) {
+        final menu = menuProvider.menus[index];
+        return _buildMenuListTile(menu, context);
+      },
+    );
+  }
+
+  Widget _buildMenuListTile(Menu menu, BuildContext context) {
+    return ListTile(
+      // ignore: unnecessary_null_comparison
+      leading: menu.image != null && menu.image.isNotEmpty
+          ? Image.network(
+              menu.image,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            )
+          : const Icon(Icons.fastfood, size: 50),
+      title: Text(menu.menuName),
+      subtitle: Text(menu.description),
+      trailing: const Icon(Icons.edit),
+      onTap: () => _navigateToMenuFormScreen(context, menu: menu),
+    );
+  }
+
+  // Navigates to the MenuFormScreen, optionally passing a menu for editing
+  void _navigateToMenuFormScreen(BuildContext context, {Menu? menu}) {
+    // Determine if we are editing or creating
+    final isEditing = menu != null;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MenuFormScreen(
+          menu: menu,
+          isEditing: isEditing, // Pass a bool value instead of null
+        ),
       ),
     );
   }
