@@ -15,54 +15,58 @@ class Perk {
     required this.updatedBy,
     required this.updatedAt,
   });
-  late final int perkID;
-  late final int perkType;
-  late final String perkName;
-  late final String description;
-  late final int value;
-  late final String startDate;
-  late final String endDate;
-  late final bool isActive;
-  late final int minPurchaseAmount;
-  late final int maxDiscountAmount;
-  late final int createdBy;
-  late final String createdAt;
-  late final int updatedBy;
-  late final String updatedAt;
 
-  Perk.fromJson(Map<String, dynamic> json) {
-    perkID = json['perkID'];
-    perkType = json['perkType'];
-    perkName = json['perkName'];
-    description = json['description'];
-    value = json['value'];
-    startDate = json['startDate'];
-    endDate = json['endDate'];
-    isActive = json['isActive'];
-    minPurchaseAmount = json['minPurchaseAmount'];
-    maxDiscountAmount = json['maxDiscountAmount'];
-    createdBy = json['createdBy'];
-    createdAt = json['createdAt'];
-    updatedBy = json['updatedBy'];
-    updatedAt = json['updatedAt'];
+  final int perkID;
+  final int perkType;
+  final String perkName;
+  final String description;
+  final int value;
+  final String startDate;
+  final String endDate;
+  final bool isActive;
+  final int minPurchaseAmount;
+  final int maxDiscountAmount;
+  final int createdBy;
+  final String createdAt;
+  final int updatedBy;
+  final String updatedAt;
+
+  factory Perk.fromJson(Map<String, dynamic> json) {
+    return Perk(
+      perkID: json['perkID'] as int,
+      perkType: json['perkType'] as int,
+      perkName: json['perkName'] as String,
+      description: json['description'] as String? ??
+          '', // Default to empty string if null
+      value: json['value'] as int,
+      startDate: json['startDate'] as String,
+      endDate: json['endDate'] as String,
+      isActive: json['isActive'] as bool,
+      minPurchaseAmount: json['minPurchaseAmount'] as int,
+      maxDiscountAmount: json['maxDiscountAmount'] as int,
+      createdBy: json['createdBy'] as int,
+      createdAt: json['createdAt'] as String,
+      updatedBy: json['updatedBy'] as int,
+      updatedAt: json['updatedAt'] as String,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['perkID'] = perkID;
-    data['perkType'] = perkType;
-    data['perkName'] = perkName;
-    data['description'] = description;
-    data['value'] = value;
-    data['startDate'] = startDate;
-    data['endDate'] = endDate;
-    data['isActive'] = isActive;
-    data['minPurchaseAmount'] = minPurchaseAmount;
-    data['maxDiscountAmount'] = maxDiscountAmount;
-    data['createdBy'] = createdBy;
-    data['createdAt'] = createdAt;
-    data['updatedBy'] = updatedBy;
-    data['updatedAt'] = updatedAt;
-    return data;
+    return {
+      'perkID': perkID,
+      'perkType': perkType,
+      'perkName': perkName,
+      'description': description,
+      'value': value,
+      'startDate': startDate,
+      'endDate': endDate,
+      'isActive': isActive,
+      'minPurchaseAmount': minPurchaseAmount,
+      'maxDiscountAmount': maxDiscountAmount,
+      'createdBy': createdBy,
+      'createdAt': createdAt,
+      'updatedBy': updatedBy,
+      'updatedAt': updatedAt,
+    };
   }
 }

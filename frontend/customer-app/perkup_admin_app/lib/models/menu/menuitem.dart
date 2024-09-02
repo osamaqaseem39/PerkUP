@@ -1,21 +1,19 @@
 class MenuItem {
-  MenuItem({
-    required this.menuItemID,
-    required this.menuID,
-    required this.itemName,
-    required this.description,
-    required this.image,
-    required this.price,
-    required this.discount,
-    required this.isPercentageDiscount,
-    required this.isActive,
-    required this.category,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedBy,
-    required this.updatedAt,
-    required this.menu,
-  });
+  MenuItem(
+      {required this.menuItemID,
+      required this.menuID,
+      required this.itemName,
+      required this.description,
+      required this.image,
+      required this.price,
+      required this.discount,
+      required this.isPercentageDiscount,
+      required this.isActive,
+      required this.category,
+      required this.createdBy,
+      required this.createdAt,
+      required this.updatedBy,
+      required this.updatedAt});
 
   late final int menuItemID;
   late final int menuID;
@@ -31,7 +29,6 @@ class MenuItem {
   late final String createdAt;
   late final int updatedBy;
   late final String updatedAt;
-  late final String menu;
 
   MenuItem.fromJson(Map<String, dynamic> json) {
     menuItemID = json['menuItemID'];
@@ -48,7 +45,6 @@ class MenuItem {
     createdAt = json['createdAt'];
     updatedBy = json['updatedBy'];
     updatedAt = json['updatedAt'];
-    menu = json['menu'];
   }
 
   Map<String, dynamic> toJson() {
@@ -67,7 +63,6 @@ class MenuItem {
     data['createdAt'] = createdAt;
     data['updatedBy'] = updatedBy;
     data['updatedAt'] = updatedAt;
-    data['menu'] = menu;
     return data;
   }
 }

@@ -101,17 +101,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Perk>()
             .Property(p => p.Value)
             .HasColumnType("decimal(18, 2)");
-    
-        modelBuilder.Entity<Menu>()
-           .HasMany(m => m.MenuItems)
-           .WithOne(mi => mi.Menu)
-           .HasForeignKey(mi => mi.MenuID);
 
-        modelBuilder.Entity<MenuItem>()
-            .HasOne(mi => mi.Menu)
-            .WithMany(m => m.MenuItems)
+
+        // Configuration for Menu and MenuItem relationship
+        modelBuilder.Entity<Menu>()
+            .HasMany(m => m.MenuItems)
+            .WithOne() // Removed .WithOne(mi => mi.Menu)
             .HasForeignKey(mi => mi.MenuID);
     }
+
 
 
     public override int SaveChanges()

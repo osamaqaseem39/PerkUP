@@ -36,6 +36,9 @@ public class MenusController : ControllerBase
                     using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         var menus = new List<Menu>();
+                        var menuItems = new List<MenuItem>();
+
+                        // Read menus
                         while (await reader.ReadAsync())
                         {
                             menus.Add(new Menu
@@ -50,6 +53,38 @@ public class MenusController : ControllerBase
                                 UpdatedBy = reader.GetInt32(reader.GetOrdinal("UpdatedBy")),
                                 UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
                             });
+                        }
+
+                        // Move to the next result set
+                        if (await reader.NextResultAsync())
+                        {
+                            // Read menu items
+                            while (await reader.ReadAsync())
+                            {
+                                menuItems.Add(new MenuItem
+                                {
+                                    MenuItemID = reader.GetInt32(reader.GetOrdinal("MenuItemID")),
+                                    MenuID = reader.GetInt32(reader.GetOrdinal("MenuID")),
+                                    ItemName = reader.GetString(reader.GetOrdinal("ItemName")),
+                                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                    Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Discount = reader.IsDBNull(reader.GetOrdinal("Discount")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("Discount")),
+                                    IsPercentageDiscount = reader.GetBoolean(reader.GetOrdinal("IsPercentageDiscount")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
+                                    Category = reader.IsDBNull(reader.GetOrdinal("Category")) ? null : reader.GetString(reader.GetOrdinal("Category")),
+                                    CreatedBy = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    UpdatedBy = reader.GetInt32(reader.GetOrdinal("UpdatedBy")),
+                                    UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
+                                });
+                            }
+                        }
+
+                        // Link menu items to their corresponding menus
+                        foreach (var menu in menus)
+                        {
+                            menu.MenuItems = menuItems.Where(mi => mi.MenuID == menu.MenuID).ToList();
                         }
 
                         return Ok(menus);

@@ -37,7 +37,7 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
         createdAt: DateTime.now().toString(),
         updatedBy: 1, // Replace with actual user ID
         updatedAt: DateTime.now().toString(),
-        image: _imageController.text, menu: '', // Assuming image path or URL
+        image: _imageController.text,
       );
 
       setState(() {

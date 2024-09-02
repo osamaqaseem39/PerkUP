@@ -217,8 +217,10 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                         await LoginResponse.loadFromPreferences();
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
+
                       final perk = Perk(
-                        perkID: widget.perk!.perkID,
+                        perkID: widget.perk?.perkID ??
+                            0, // Use default value if null
                         perkType: _perkType!,
                         perkName: _perkName,
                         description: _description,
@@ -233,11 +235,13 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                         updatedBy: user.userId,
                         updatedAt: _formatDate(DateTime.now()),
                       );
+
                       if (widget.perk == null) {
-                        perkProvider.createPerk(perk, token!);
+                        await perkProvider.createPerk(perk, token!);
                       } else {
-                        perkProvider.updatePerk(perk, token!);
+                        await perkProvider.updatePerk(perk, token!);
                       }
+
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
                     }
