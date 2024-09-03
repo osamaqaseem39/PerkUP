@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perkup_user_app/models/perk/perktype.dart';
 
 class PerkTypeService {
-  static const String baseUrl = 'https://localhost:44320/api';
+  static const String baseUrl = 'https://192.168.10.18:44320/api';
 
   Future<List<PerkType>> fetchPerkTypes(String token) async {
     final response = await http.get(

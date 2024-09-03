@@ -43,7 +43,18 @@ class _MenuListScreenState extends State<MenuListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _navigateToMenuFormScreen(context),
+            onPressed: () => _navigateToMenuFormScreen(context,
+                menu: Menu(
+                    menuID: 0,
+                    menuName: "",
+                    description: "",
+                    image: "",
+                    isActive: true,
+                    createdBy: 0,
+                    createdAt: "",
+                    updatedBy: 0,
+                    updatedAt: "",
+                    menuItems: [])),
           ),
         ],
       ),
@@ -92,14 +103,14 @@ class _MenuListScreenState extends State<MenuListScreen> {
   }
 
   // Navigates to the MenuFormScreen, optionally passing a menu for editing
-  void _navigateToMenuFormScreen(BuildContext context, {Menu? menu}) {
+  void _navigateToMenuFormScreen(BuildContext context, {required Menu menu}) {
     // Determine if we are editing or creating
-    final isEditing = menu != null;
+    final isEditing = menu.menuID != 0;
 
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => MenuFormScreen(
-          menu: menu,
+          currentMenu: menu,
           isEditing: isEditing, // Pass a bool value instead of null
         ),
       ),

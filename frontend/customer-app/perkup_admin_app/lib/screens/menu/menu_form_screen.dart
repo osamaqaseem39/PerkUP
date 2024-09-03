@@ -1,21 +1,23 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http; // For making HTTP requests
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:perkup_user_app/models/login/login_response.dart';
 import 'package:perkup_user_app/models/menu/menu.dart';
 import 'package:perkup_user_app/models/menu/menuitem.dart';
 import 'package:perkup_user_app/providers/menu_provider.dart';
-import 'dart:convert'; // For JSON encoding/decoding
-import 'menu_item_form_screen.dart'; // Adjust the import as necessary
+import 'menu_item_form_screen.dart';
 
 class MenuFormScreen extends StatefulWidget {
-  final Menu? currentMenu;
+  final Menu currentMenu;
   final bool isEditing;
 
-  const MenuFormScreen(
-      {super.key, this.currentMenu, required this.isEditing, Menu? menu});
+  const MenuFormScreen({
+    super.key,
+    required this.currentMenu,
+    required this.isEditing,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -34,17 +36,23 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
   @override
   void initState() {
     super.initState();
-    _menuItems = widget.isEditing ? widget.currentMenu?.menuItems ?? [] : [];
+    // Initialize fields if editing an existing menu
     if (widget.isEditing) {
-      _menuNameController.text = widget.currentMenu?.menuName ?? '';
-      _descriptionController.text = widget.currentMenu?.description ?? '';
-      _isActive = widget.currentMenu?.isActive ?? true;
-      // Load the existing image if available
-      if (widget.currentMenu?.image != null &&
-          widget.currentMenu?.image.isNotEmpty == true) {
-        // For showing the existing image, you may fetch it from server if needed
-        _imageFile = File(widget.currentMenu!.image);
+      _menuNameController.text = widget.currentMenu.menuName;
+      _descriptionController.text = widget.currentMenu.description;
+      _isActive = widget.currentMenu.isActive;
+      _menuItems = widget.currentMenu.menuItems;
+
+      // Load existing image if available
+      if (widget.currentMenu.image.isNotEmpty) {
+        try {
+          _imageFile = File(widget.currentMenu.image);
+        } catch (e) {
+          // Handle invalid file paths if necessary
+        }
       }
+    } else {
+      _menuItems = [];
     }
   }
 
@@ -52,31 +60,42 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
     final pickedFile =
         await _imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      // Save the picked image into the appropriate directory
+      final savedImage =
+          await _saveImageToLocalDirectory(File(pickedFile.path));
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFile = savedImage;
       });
     }
   }
 
-  Future<String> _uploadImage(File image) async {
-    final uri = Uri.parse(
-        'YOUR_SERVER_UPLOAD_ENDPOINT'); // Replace with your server upload endpoint
-    final request = http.MultipartRequest('POST', uri)
-      ..files.add(await http.MultipartFile.fromPath('file', image.path));
-    final response = await request.send();
-    if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      final responseJson = jsonDecode(responseBody);
-      return responseJson['imagePath']; // Adjust according to your API response
-    } else {
-      throw Exception('Failed to upload image');
+  Future<File> _saveImageToLocalDirectory(File image) async {
+    // Get application documents directory
+    final directory = await getApplicationDocumentsDirectory();
+
+    // Create a subfolder with the menu name and user ID
+    final folderPath = path.join(
+      directory.path,
+      'images',
+      '${_menuNameController.text}_${widget.currentMenu.createdBy}',
+    );
+    final folder = Directory(folderPath);
+    if (!await folder.exists()) {
+      await folder.create(recursive: true);
     }
+
+    // Save the file with the menu name and ID as part of the file name
+    final fileName =
+        '${_menuNameController.text}_${widget.currentMenu.menuID}.png';
+    final savedImagePath = path.join(folder.path, fileName);
+
+    // Copy the picked image to the desired path
+    return image.copy(savedImagePath);
   }
 
   @override
   Widget build(BuildContext context) {
-    final menuProvider =
-        MenuProvider(); // Replace with actual provider instance
+    final menuProvider = MenuProvider();
 
     return Scaffold(
       appBar: AppBar(
@@ -112,12 +131,19 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
                           height: 100,
                           fit: BoxFit.cover,
                         )
-                      : Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.image, size: 50),
-                        ),
+                      : widget.currentMenu.image.isNotEmpty
+                          ? Image.network(
+                              widget.currentMenu.image,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              width: 100,
+                              height: 100,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.image, size: 50),
+                            ),
                   const SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: _pickImage,
@@ -161,41 +187,50 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
+                  // Load the user information from preferences or wherever it is stored
+                  LoginResponse? user =
+                      await LoginResponse.loadFromPreferences();
+
                   if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+
                     String imagePath = '';
                     if (_imageFile != null) {
-                      try {
-                        imagePath = await _uploadImage(_imageFile!);
-                      } catch (e) {
-                        // Handle image upload error
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Failed to upload image')),
-                        );
-                        return;
-                      }
+                      imagePath = _imageFile!.path; // Use the saved file path
+                    } else if (widget.currentMenu.image.isNotEmpty) {
+                      imagePath = widget.currentMenu.image;
                     }
 
                     final menu = Menu(
-                      menuID: widget.isEditing ? widget.currentMenu!.menuID : 0,
+                      menuID: widget.isEditing ? widget.currentMenu.menuID : 0,
                       menuName: _menuNameController.text,
                       description: _descriptionController.text,
                       isActive: _isActive,
-                      createdBy: 1, // Replace with actual user ID
-                      createdAt: DateTime.now().toString(),
-                      updatedBy: 1, // Replace with actual user ID
+                      createdBy: widget.isEditing
+                          ? widget.currentMenu.createdBy
+                          : user!.userId,
+                      createdAt: widget.isEditing
+                          ? widget.currentMenu.createdAt
+                          : DateTime.now().toString(),
+                      updatedBy: user!.userId,
                       updatedAt: DateTime.now().toString(),
                       menuItems: _menuItems,
                       image: imagePath,
                     );
 
+                    // Use the user's token for API requests
+                    String? token =
+                        user.token; // Adjust to fetch the token properly
+
                     if (widget.isEditing) {
-                      menuProvider.updateMenu(
-                          menu.menuID as Menu, menu as String);
+                      await menuProvider.updateMenu(
+                          menu, token); // Pass the token when updating
                     } else {
-                      menuProvider.addMenu(menu);
+                      menuProvider.addMenu(
+                          menu, token); // Pass the token when creating
                     }
 
+                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   }
                 },

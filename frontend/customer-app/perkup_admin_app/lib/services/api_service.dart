@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perkup_user_app/models/login/login_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://localhost:44320/api';
+  static const String baseUrl = 'https://192.168.10.18:7295/api';
 
   Future<LoginResponse?> login(String username, String password) async {
     final response = await http.post(

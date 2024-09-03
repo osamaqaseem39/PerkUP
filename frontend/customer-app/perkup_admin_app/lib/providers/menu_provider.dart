@@ -70,7 +70,7 @@ class MenuProvider with ChangeNotifier {
   }
 
   // Add a new menu to the local list without fetching from the server
-  void addMenu(Menu menu) {
+  void addMenu(Menu menu, String token) {
     _menus.add(menu);
     notifyListeners();
   }
