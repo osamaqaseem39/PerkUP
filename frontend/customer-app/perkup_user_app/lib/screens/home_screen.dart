@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:perkup_user_app/providers/user_provider.dart';
+import 'package:perkup_user_app/models/login/login_response.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  Future<String?> _getDisplayName() async {
+    try {
+      final LoginResponse? loginResponse =
+          await LoginResponse.loadFromPreferences();
+      return loginResponse?.displayName;
+    } catch (e) {
+      print('Error loading display name: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    final userProvider = Provider.of<UserProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -28,7 +35,76 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      drawer: _buildDrawer(context),
+      drawer: FutureBuilder<String?>(
+        future: _getDisplayName(),
+        builder: (context, snapshot) {
+          String displayName = snapshot.data ?? 'User';
+
+          return Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'Welcome, $displayName',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.home),
+                  title: const Text('Home'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                // ListTile(
+                //   leading: const Icon(Icons.settings),
+                //   title: const Text('Settings'),
+                //   onTap: () {
+                //     Navigator.pushNamed(context, '/settings');
+                //   },
+                // ),
+                // ListTile(
+                //   leading: const Icon(Icons.help),
+                //   title: const Text('Help & Support'),
+                //   onTap: () {
+                //     Navigator.pushNamed(context, '/help');
+                //   },
+                // ),
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Logout'),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
@@ -38,10 +114,26 @@ class HomeScreen extends StatelessWidget {
           children: <Widget>[
             _buildCard(
               context,
-              icon: Icons.shopping_cart,
+              icon: Icons.local_offer,
               title: 'Offers',
               onTap: () {
                 Navigator.pushNamed(context, '/offers');
+              },
+            ),
+            _buildCard(
+              context,
+              icon: Icons.card_giftcard,
+              title: 'Discounts',
+              onTap: () {
+                Navigator.pushNamed(context, '/discounts');
+              },
+            ),
+            _buildCard(
+              context,
+              icon: Icons.card_giftcard,
+              title: 'Vouchers',
+              onTap: () {
+                Navigator.pushNamed(context, '/vouchers');
               },
             ),
             _buildCard(
@@ -52,92 +144,8 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/restaurants');
               },
             ),
-            _buildCard(
-              context,
-              icon: Icons.local_offer,
-              title: 'Vouchers',
-              onTap: () {
-                Navigator.pushNamed(context, '/vouchers');
-              },
-            ),
-            _buildCard(
-              context,
-              icon: Icons.map,
-              title: 'Map',
-              onTap: () {
-                Navigator.pushNamed(context, '/map');
-              },
-            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDrawer(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.blueAccent,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Text(
-                  'Welcome, ${userProvider.currentUser}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
-            onTap: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.help),
-            title: const Text('Help & Support'),
-            onTap: () {
-              Navigator.pushNamed(context, '/help');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
       ),
     );
   }

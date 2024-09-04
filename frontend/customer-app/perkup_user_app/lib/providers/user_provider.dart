@@ -15,13 +15,13 @@ class UserProvider with ChangeNotifier {
 
   final UserService _userService = UserService();
 
-  Future<void> fetchUsers(String token) async {
+  Future<void> fetchUsers() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _users = await _userService.fetchUsers(token);
+      _users = await _userService.fetchUsers();
     } catch (e) {
       _errorMessage = _parseError(e);
     }
@@ -30,14 +30,14 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createUser(User user, String token, String text) async {
+  Future createUser(User user) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _userService.createUser(user, token);
-      await fetchUsers(token);
+      await _userService.createUser(user);
+      await fetchUsers();
     } catch (e) {
       _errorMessage = _parseError(e);
     }
@@ -46,14 +46,14 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateUser(User user, String token) async {
+  Future updateUser(User user) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _userService.updateUser(user, token);
-      await fetchUsers(token);
+      await _userService.updateUser(user);
+      await fetchUsers();
     } catch (e) {
       _errorMessage = _parseError(e);
     }
@@ -62,14 +62,14 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteUser(int id, String token) async {
+  Future<void> deleteUser(int id) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _userService.deleteUser(id, token);
-      await fetchUsers(token);
+      await _userService.deleteUser(id);
+      await fetchUsers();
     } catch (e) {
       _errorMessage = _parseError(e);
     }

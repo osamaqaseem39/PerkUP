@@ -209,5 +209,63 @@ public class PerksController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+    [Authorize]
+    [HttpGet("GetPerksByPerkType/{perkType}")]
+    public async Task<IActionResult> GetPerksByPerkType(int perkType)
+    {
+        try
+        {
+            List<Perk> perks = new List<Perk>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("GetPerksByPerkType", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@PerkType", perkType);
+
+                    await connection.OpenAsync();
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            Perk perk = new Perk
+                            {
+                                PerkID = Convert.ToInt32(reader["PerkID"]),
+                                PerkType = Convert.ToInt32(reader["PerkType"]), // Ensure this is integer
+                                PerkName = reader["PerkName"].ToString(),
+                                Description = reader["Description"].ToString(),
+                                Value = (decimal)reader["Value"],
+                                StartDate = reader["StartDate"] != DBNull.Value ? (DateTime?)reader["StartDate"] : null,
+                                EndDate = reader["EndDate"] != DBNull.Value ? (DateTime?)reader["EndDate"] : null,
+                                IsActive = (bool)reader["IsActive"],
+                                MinPurchaseAmount = reader["MinPurchaseAmount"] != DBNull.Value ? (decimal?)reader["MinPurchaseAmount"] : null,
+                                MaxDiscountAmount = reader["MaxDiscountAmount"] != DBNull.Value ? (decimal?)reader["MaxDiscountAmount"] : null,
+                                CreatedBy = (int)reader["CreatedBy"],
+                                CreatedAt = (DateTime)reader["CreatedAt"],
+                                UpdatedBy = (int)reader["UpdatedBy"],
+                                UpdatedAt = (DateTime)reader["UpdatedAt"]
+                            };
+
+                            perks.Add(perk);
+                        }
+                    }
+                }
+            }
+
+            if (perks.Count == 0)
+            {
+                return NotFound($"No perks found for the type ID: {perkType}");
+            }
+
+            return Ok(perks);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
+
 
 }

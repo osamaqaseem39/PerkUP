@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perkup_user_app/models/area/area.dart';
 
 class AreaService {
-  final String baseUrl = 'https://192.168.10.18:44320/api';
+  final String baseUrl = 'https://localhost:44320/api';
 
   Future<List<Area>> fetchAreas(String token) async {
     final response = await http.get(

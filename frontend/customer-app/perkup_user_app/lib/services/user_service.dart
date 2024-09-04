@@ -5,12 +5,9 @@ import 'package:perkup_user_app/models/user/user.dart';
 class UserService {
   static const String baseUrl = 'https://localhost:44320/api';
 
-  Future<List<User>> fetchUsers(String token) async {
+  Future<List<User>> fetchUsers() async {
     final response = await http.get(
       Uri.parse('$baseUrl/users'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      },
     );
 
     if (response.statusCode == 200) {
@@ -21,12 +18,9 @@ class UserService {
     }
   }
 
-  Future<User> fetchUserById(int id, String token) async {
+  Future<User> fetchUserById(int id) async {
     final response = await http.get(
       Uri.parse('$baseUrl/users/$id'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      },
     );
 
     if (response.statusCode == 200) {
@@ -36,12 +30,11 @@ class UserService {
     }
   }
 
-  Future<void> createUser(User user, String token) async {
+  Future<void> createUser(User user) async {
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
@@ -52,12 +45,11 @@ class UserService {
     }
   }
 
-  Future<void> updateUser(User user, String token) async {
+  Future<void> updateUser(User user) async {
     final response = await http.put(
       Uri.parse('$baseUrl/users/${user.userID}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
@@ -67,12 +59,9 @@ class UserService {
     }
   }
 
-  Future<void> deleteUser(int id, String token) async {
+  Future<void> deleteUser(int id) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/users/$id'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      },
     );
 
     if (response.statusCode != 200) {

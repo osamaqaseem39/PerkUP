@@ -1,3 +1,4 @@
+import 'dart:convert'; // Import for JSON encoding/decoding
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginResponse {
@@ -5,31 +6,37 @@ class LoginResponse {
     required this.userId,
     required this.bearerToken,
     required this.token,
+    required this.displayName,
   });
 
   final int userId;
   final String bearerToken;
   final String token;
+  final String displayName;
 
-  LoginResponse.fromJson(Map<String, dynamic> json)
-      : userId = json['userId'],
-        bearerToken = json['bearerToken'],
-        token = json['token'];
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      userId: json['userId'],
+      bearerToken: json['bearerToken'],
+      token: json['token'],
+      displayName: json['displayName'],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
       'bearerToken': bearerToken,
       'token': token,
+      'displayName': displayName,
     };
   }
 
   static Future<void> saveToPreferences(LoginResponse loginResponse) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('userId', loginResponse.userId);
-      await prefs.setString('bearerToken', loginResponse.bearerToken);
-      await prefs.setString('token', loginResponse.token);
+      final String jsonString = json.encode(loginResponse.toJson());
+      await prefs.setString('loginResponse', jsonString);
     } catch (e) {
       print('Error saving to preferences: $e');
       throw e;
@@ -39,21 +46,13 @@ class LoginResponse {
   static Future<LoginResponse?> loadFromPreferences() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (!prefs.containsKey('userId') ||
-          !prefs.containsKey('bearerToken') ||
-          !prefs.containsKey('token')) {
+      final String? jsonString = prefs.getString('loginResponse');
+      if (jsonString == null) {
         return null;
       }
 
-      final int userId = prefs.getInt('userId')!;
-      final String bearerToken = prefs.getString('bearerToken')!;
-      final String token = prefs.getString('token')!;
-
-      return LoginResponse(
-        userId: userId,
-        bearerToken: bearerToken,
-        token: token,
-      );
+      final Map<String, dynamic> jsonMap = json.decode(jsonString);
+      return LoginResponse.fromJson(jsonMap);
     } catch (e) {
       print('Error loading from preferences: $e');
       throw e;
@@ -63,9 +62,7 @@ class LoginResponse {
   static Future<void> clearPreferences() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('userId');
-      await prefs.remove('bearerToken');
-      await prefs.remove('token');
+      await prefs.remove('loginResponse');
     } catch (e) {
       print('Error clearing preferences: $e');
       throw e;
