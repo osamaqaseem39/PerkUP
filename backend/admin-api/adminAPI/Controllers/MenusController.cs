@@ -98,6 +98,84 @@ public class MenusController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpGet("GetMenusByCreatedBy/{createdBy}")]
+    public async Task<IActionResult> GetMenusByCreatedBy(int createdBy)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (SqlCommand command = new SqlCommand("GetMenusByCreatedBy", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@CreatedBy", createdBy);
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        var menus = new List<Menu>();
+
+                        // Read the Menu data
+                        while (await reader.ReadAsync())
+                        {
+                            var menu = new Menu
+                            {
+                                MenuID = reader.GetInt32(reader.GetOrdinal("MenuID")),
+                                MenuName = reader.GetString(reader.GetOrdinal("MenuName")),
+                                Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
+                                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
+                                CreatedBy = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                UpdatedBy = reader.GetInt32(reader.GetOrdinal("UpdatedBy")),
+                                UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
+                                MenuItems = new List<MenuItem>()
+                            };
+
+                            menus.Add(menu);
+                        }
+
+                        // Move to the next result set for MenuItems
+                        if (await reader.NextResultAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var menuItem = new MenuItem
+                                {
+                                    MenuItemID = reader.GetInt32(reader.GetOrdinal("MenuItemID")),
+                                    MenuID = reader.GetInt32(reader.GetOrdinal("MenuID")),
+                                    ItemName = reader.GetString(reader.GetOrdinal("ItemName")),
+                                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                    Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Discount = reader.GetDecimal(reader.GetOrdinal("Discount")),
+                                    IsPercentageDiscount = reader.GetBoolean(reader.GetOrdinal("IsPercentageDiscount")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
+                                    CreatedBy = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    UpdatedBy = reader.GetInt32(reader.GetOrdinal("UpdatedBy")),
+                                    UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt"))
+                                };
+
+                                // Find the menu that matches the MenuID of the menu item
+                                var menu = menus.FirstOrDefault(m => m.MenuID == menuItem.MenuID);
+                                menu?.MenuItems.Add(menuItem);
+                            }
+                        }
+
+                        return Ok(menus);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
     // GET: api/menus/{id}
     [Authorize]
     [HttpGet("{id}")]
