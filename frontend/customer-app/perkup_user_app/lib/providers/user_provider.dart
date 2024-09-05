@@ -15,6 +15,22 @@ class UserProvider with ChangeNotifier {
 
   final UserService _userService = UserService();
 
+  // Fetch users by UserType
+  Future<void> fetchUsersByType(String userType) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _users = await _userService.fetchUsersByType(userType);
+    } catch (e) {
+      _errorMessage = _parseError(e);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> fetchUsers() async {
     _isLoading = true;
     _errorMessage = null;

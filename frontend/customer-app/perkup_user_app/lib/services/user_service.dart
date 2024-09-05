@@ -4,6 +4,18 @@ import 'package:perkup_user_app/models/user/user.dart';
 
 class UserService {
   static const String baseUrl = 'https://localhost:44320/api';
+  Future<List<User>> fetchUsersByType(String userType) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/users?userType=$userType'),
+    );
+
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((user) => User.fromJson(user)).toList();
+    } else {
+      throw Exception('Failed to load users by type');
+    }
+  }
 
   Future<List<User>> fetchUsers() async {
     final response = await http.get(

@@ -222,5 +222,65 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
+    [HttpGet("GetByUserType/{userType}")]
+    public async Task<IActionResult> GetUserByUserType(string userType)
+    {
+        try
+        {
+            List<User> users = new List<User>();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("GetUsersByUserType", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@UserType", userType);
+
+                    await connection.OpenAsync();
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            User user = new User
+                            {
+                                UserID = Convert.ToInt32(reader["UserID"]),
+                                UserType = reader["UserType"].ToString(),
+                                Username = reader["Username"].ToString(),
+                                DisplayName = reader["DisplayName"].ToString(),
+                                FirstName = reader["FirstName"].ToString(),
+                                LastName = reader["LastName"].ToString(),
+                                UserEmail = reader["UserEmail"].ToString(),
+                                UserContact = reader["UserContact"].ToString(),
+                                Password = reader["Password"].ToString(),
+                                Images = reader["Images"].ToString(),
+                                RoleID = reader["RoleID"] != DBNull.Value ? (int?)reader["RoleID"] : null,
+                                Description = reader["Description"].ToString(),
+                                AddressID = reader["AddressID"] != DBNull.Value ? (int?)reader["AddressID"] : null,
+                                CreatedBy = Convert.ToInt32(reader["CreatedBy"]),
+                                CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
+                                UpdatedBy = Convert.ToInt32(reader["UpdatedBy"]),
+                                UpdatedAt = Convert.ToDateTime(reader["UpdatedAt"])
+                            };
+
+                            users.Add(user);
+                        }
+                    }
+                }
+            }
+
+            if (users.Count > 0)
+            {
+                return Ok(users);
+            }
+            else
+            {
+                return NotFound("No users found with the specified user type.");
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
 
 }
