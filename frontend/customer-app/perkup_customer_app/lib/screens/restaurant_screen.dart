@@ -83,7 +83,7 @@ class RestaurantScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => MenuScreen(
-                            createdBy: vendor.createdBy, // Pass the vendor's ID
+                            createdBy: vendor.userID, // Pass the vendor's ID
                           ),
                         ),
                       );

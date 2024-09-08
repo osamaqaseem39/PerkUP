@@ -17,10 +17,15 @@ class MenuScreen extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final token = loginProvider.token;
       if (token != null) {
-        menuProvider.fetchMenusByCreatedBy(createdBy, token);
+        menuProvider.fetchMenusByCreatedBy(createdBy, token).then((_) {
+          print('Menus fetched successfully');
+        }).catchError((error) {
+          print('Error fetching menus: $error');
+        });
+      } else {
+        print('No token available');
       }
     });
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Menus'),
@@ -80,19 +85,72 @@ class MenuScreen extends StatelessWidget {
               itemCount: menuProvider.menus.length,
               itemBuilder: (context, index) {
                 final menu = menuProvider.menus[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  elevation: 4.0,
-                  child: ListTile(
-                    leading:
-                        const Icon(Icons.menu_book, color: Colors.blueAccent),
-                    title: Text(
-                      menu.menuName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Menu Details
+                    Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      elevation: 4.0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              menu.menuName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              menu.description,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                            const SizedBox(height: 16.0),
+                          ],
+                        ),
+                      ),
                     ),
-                    subtitle: Text(menu.description),
-                    contentPadding: const EdgeInsets.all(16.0),
-                  ),
+
+                    // Menu Items
+                    if (menu.menuItems.isNotEmpty)
+                      ...menu.menuItems.map((item) => Card(
+                            margin: const EdgeInsets.symmetric(vertical: 4.0),
+                            elevation: 2.0,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(16.0),
+                              title: Text(
+                                item.itemName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Price: \$${item.price.toStringAsFixed(2)}',
+                                    style: const TextStyle(color: Colors.green),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    item.description,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
+                    if (menu.menuItems.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('No items available.'),
+                      ),
+                    const SizedBox(height: 16.0),
+                  ],
                 );
               },
             ),

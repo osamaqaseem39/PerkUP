@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_vendor_app/providers/login_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:perkup_vendor_app/models/menu/menuitem.dart';
 
 class MenuItemFormScreen extends StatefulWidget {
@@ -20,11 +22,18 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
   bool _isPercentageDiscount = false;
+  int? _editingItemIndex;
 
-  void _addItem() {
+  void _addOrUpdateItem() {
     if (_formKey.currentState!.validate()) {
+      // Fetch current user's ID from the provider
+      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+      final currentUserId = loginProvider.userId; // Get the user ID
+
       final newItem = MenuItem(
-        menuItemID: 0, // Assign ID based on your backend logic
+        menuItemID: _editingItemIndex != null
+            ? widget.menuItems[_editingItemIndex!].menuItemID
+            : 0,
         menuID: 0, // This will be updated when the menu is created
         itemName: _itemNameController.text,
         description: _descriptionController.text,
@@ -33,31 +42,61 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
         isPercentageDiscount: _isPercentageDiscount,
         isActive: true,
         category: _categoryController.text,
-        createdBy: 1, // Replace with actual user ID
+        createdBy: currentUserId ?? 0, // Use the current user's ID
         createdAt: DateTime.now().toString(),
-        updatedBy: 1, // Replace with actual user ID
+        updatedBy: currentUserId ?? 0, // Use the current user's ID
         updatedAt: DateTime.now().toString(),
         image: _imageController.text,
       );
 
-      setState(() {
-        widget.menuItems.add(newItem);
-      });
+      if (_editingItemIndex != null) {
+        // Update existing item
+        setState(() {
+          widget.menuItems[_editingItemIndex!] = newItem;
+        });
+      } else {
+        // Add new item
+        setState(() {
+          widget.menuItems.add(newItem);
+        });
+      }
 
-      _itemNameController.clear();
-      _descriptionController.clear();
-      _priceController.clear();
-      _discountController.clear();
-      _categoryController.clear();
-      _imageController.clear();
+      _resetForm();
     }
+  }
+
+  void _resetForm() {
+    _itemNameController.clear();
+    _descriptionController.clear();
+    _priceController.clear();
+    _discountController.clear();
+    _categoryController.clear();
+    _imageController.clear();
+    setState(() {
+      _isPercentageDiscount = false;
+      _editingItemIndex = null;
+    });
+  }
+
+  void _editItem(int index) {
+    final item = widget.menuItems[index];
+    _itemNameController.text = item.itemName;
+    _descriptionController.text = item.description;
+    _priceController.text = item.price.toString();
+    _discountController.text = item.discount.toString();
+    _categoryController.text = item.category;
+    _imageController.text = item.image;
+    setState(() {
+      _isPercentageDiscount = item.isPercentageDiscount;
+      _editingItemIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Menu Items'),
+        title: const Text('Add/Update Menu Items'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -75,54 +114,12 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-              ),
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a price';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _discountController,
-                decoration: const InputDecoration(labelText: 'Discount'),
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(labelText: 'Category'),
-              ),
-              TextFormField(
-                controller: _imageController,
-                decoration: const InputDecoration(labelText: 'Image URL'),
-              ),
-              Row(
-                children: [
-                  const Text('Percentage Discount'),
-                  Switch(
-                    value: _isPercentageDiscount,
-                    onChanged: (value) {
-                      setState(() {
-                        _isPercentageDiscount = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              // Other form fields...
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _addItem,
-                child: const Text('Add Item'),
+                onPressed: _addOrUpdateItem,
+                child: Text(
+                    _editingItemIndex == null ? 'Add Item' : 'Update Item'),
               ),
               const SizedBox(height: 20),
               Expanded(
@@ -133,6 +130,10 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
                     return ListTile(
                       title: Text(item.itemName),
                       subtitle: Text('Price: \$${item.price}'),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _editItem(index),
+                      ),
                     );
                   },
                 ),

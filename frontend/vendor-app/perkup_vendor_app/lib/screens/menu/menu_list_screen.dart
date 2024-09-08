@@ -88,13 +88,14 @@ class _MenuListScreenState extends State<MenuListScreen> {
     return ListTile(
       // ignore: unnecessary_null_comparison
       leading: menu.image != null && menu.image.isNotEmpty
-          ? Image.network(
-              menu.image,
-              width: 50,
-              height: 50,
+          ? Image.asset(
+              'assets/images/menu/${menu.image}',
+              width: 150,
+              height: 150,
               fit: BoxFit.cover,
             )
           : const Icon(Icons.fastfood, size: 50),
+
       title: Text(menu.menuName),
       subtitle: Text(menu.description),
       trailing: const Icon(Icons.edit),

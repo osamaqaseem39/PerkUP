@@ -23,6 +23,7 @@ class MenuProvider with ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = 'Failed to load menus. Please try again later.';
+      print('Exception: $e'); // Log the error
       _menus = [];
     } finally {
       _isLoading = false;

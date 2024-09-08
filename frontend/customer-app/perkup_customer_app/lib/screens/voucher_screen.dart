@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_customer_app/providers/login_provider.dart';
 import 'package:perkup_customer_app/providers/perk_provider.dart';
+import 'package:perkup_customer_app/screens/qrcode_screen.dart';
 
 class VoucherScreen extends StatelessWidget {
   const VoucherScreen({super.key});
@@ -65,6 +66,8 @@ class VoucherScreen extends StatelessWidget {
             );
           }
 
+          final userId = loginProvider.userId; // Get current user's ID
+
           return RefreshIndicator(
             onRefresh: () async {
               final token =
@@ -90,6 +93,18 @@ class VoucherScreen extends StatelessWidget {
                     ),
                     subtitle: Text(perk.description),
                     contentPadding: const EdgeInsets.all(16.0),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRCodeGenerationScreen(
+                            perkId: perk.perkID.toString(),
+                            userId: userId, // Pass the user ID
+                            perkName: perk.perkName,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },

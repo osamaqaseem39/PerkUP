@@ -8,44 +8,46 @@ class MenuService {
       'https://localhost:44320/api'; // Adjust the base URL as needed
 
   Future<List<Menu>> fetchMenusByCreatedBy(int createdBy, String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/Menus/GetMenusByCreatedBy/$createdBy'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/Menus/GetMenusByCreatedBy/$createdBy'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        List<dynamic> jsonResponse = jsonDecode(response.body);
 
-      // Map to hold menus by ID for quick lookup
-      Map<int, Menu> menuMap = {};
-      List<Menu> menuList = [];
+        Map<int, Menu> menuMap = {};
+        List<Menu> menuList = [];
 
-      // Process the list of menus
-      for (var menuJson in jsonResponse) {
-        Menu menu = Menu.fromJson(menuJson);
-        menuMap[menu.menuID] = menu;
-        menuList.add(menu);
-      }
+        for (var menuJson in jsonResponse) {
+          Menu menu = Menu.fromJson(menuJson);
+          menuMap[menu.menuID] = menu;
+          menuList.add(menu);
+        }
 
-      // Process menu items and associate them with the menus
-      for (var menuJson in jsonResponse) {
-        var menuItemsJson = menuJson['menuItems']
-            as List<dynamic>?; // Ensure 'menuItems' exists
-        if (menuItemsJson != null) {
-          Menu? menu = menuMap[menuJson['menuID']];
-          if (menu != null) {
-            menu.menuItems = menuItemsJson
-                .map((itemJson) => MenuItem.fromJson(itemJson))
-                .toList();
+        for (var menuJson in jsonResponse) {
+          var menuItemsJson = menuJson['menuItems'] as List<dynamic>?;
+          if (menuItemsJson != null) {
+            Menu? menu = menuMap[menuJson['menuID']];
+            if (menu != null) {
+              menu.menuItems = menuItemsJson
+                  .map((itemJson) => MenuItem.fromJson(itemJson))
+                  .toList();
+            }
           }
         }
-      }
 
-      return menuList;
-    } else {
-      throw Exception('Failed to load menus by createdBy');
+        return menuList;
+      } else {
+        print('Error fetching menus: ${response.body}');
+        throw Exception('Failed to load menus by createdBy');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      rethrow;
     }
   }
 

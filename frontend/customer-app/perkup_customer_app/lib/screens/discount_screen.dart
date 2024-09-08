@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:perkup_customer_app/screens/qrcode_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_customer_app/providers/login_provider.dart';
 import 'package:perkup_customer_app/providers/perk_provider.dart';
@@ -78,6 +79,8 @@ class DiscountScreen extends StatelessWidget {
               itemCount: perkProvider.perks.length,
               itemBuilder: (context, index) {
                 final perk = perkProvider.perks[index];
+                final userId = loginProvider.userId; // Get current user's ID
+
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   elevation: 4.0,
@@ -90,6 +93,18 @@ class DiscountScreen extends StatelessWidget {
                     ),
                     subtitle: Text(perk.description),
                     contentPadding: const EdgeInsets.all(16.0),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRCodeGenerationScreen(
+                            perkId: perk.perkID.toString(),
+                            userId: userId, // Pass the user ID
+                            perkName: perk.perkName,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },

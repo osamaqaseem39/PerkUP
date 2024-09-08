@@ -1,13 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 import 'package:perkup_vendor_app/models/login/login_response.dart';
 import 'package:perkup_vendor_app/models/menu/menu.dart';
 import 'package:perkup_vendor_app/models/menu/menuitem.dart';
 import 'package:perkup_vendor_app/providers/menu_provider.dart';
 import 'menu_item_form_screen.dart';
+import 'package:http/http.dart' as http;
 
 class MenuFormScreen extends StatefulWidget {
   final Menu currentMenu;
@@ -20,7 +20,6 @@ class MenuFormScreen extends StatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _MenuFormScreenState createState() => _MenuFormScreenState();
 }
 
@@ -32,23 +31,27 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
   File? _imageFile;
   bool _isActive = true;
   late List<MenuItem> _menuItems;
+  String? _base64Image;
 
   @override
   void initState() {
     super.initState();
-    // Initialize fields if editing an existing menu
     if (widget.isEditing) {
       _menuNameController.text = widget.currentMenu.menuName;
       _descriptionController.text = widget.currentMenu.description;
       _isActive = widget.currentMenu.isActive;
       _menuItems = widget.currentMenu.menuItems;
 
-      // Load existing image if available
       if (widget.currentMenu.image.isNotEmpty) {
         try {
-          _imageFile = File(widget.currentMenu.image);
+          if (widget.currentMenu.image.startsWith('data:image')) {
+            _base64Image = widget.currentMenu.image;
+          } else {
+            _imageFile = File(widget.currentMenu.image);
+          }
         } catch (e) {
           // Handle invalid file paths if necessary
+          print('Error loading image: $e');
         }
       }
     } else {
@@ -60,37 +63,47 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
     final pickedFile =
         await _imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Save the picked image into the appropriate directory
-      final savedImage =
-          await _saveImageToLocalDirectory(File(pickedFile.path));
+      final bytes = await pickedFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+
       setState(() {
-        _imageFile = savedImage;
+        _imageFile = pickedFile as File?;
+        _base64Image = base64Image;
       });
     }
   }
 
-  Future<File> _saveImageToLocalDirectory(File image) async {
-    // Get application documents directory
-    final directory = await getApplicationDocumentsDirectory();
+  Future<String> _uploadImageToServer(File imageFile) async {
+    final bytes = await imageFile.readAsBytes();
+    final base64Image = base64Encode(bytes);
 
-    // Create a subfolder with the menu name and user ID
-    final folderPath = path.join(
-      directory.path,
-      'images',
-      '${_menuNameController.text}_${widget.currentMenu.createdBy}',
-    );
-    final folder = Directory(folderPath);
-    if (!await folder.exists()) {
-      await folder.create(recursive: true);
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'YOUR_SERVER_ENDPOINT/upload_image'), // Replace with your server URL
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'image': base64Image,
+          'filename':
+              '${_menuNameController.text}_${widget.currentMenu.menuID}.png',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Assuming the server responds with the path where the image is saved
+        final responseBody = jsonDecode(response.body);
+        print('Image upload response: $responseBody');
+        return responseBody['path'];
+      } else {
+        print('Failed to upload image. Status code: ${response.statusCode}');
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+      rethrow;
     }
-
-    // Save the file with the menu name and ID as part of the file name
-    final fileName =
-        '${_menuNameController.text}_${widget.currentMenu.menuID}.png';
-    final savedImagePath = path.join(folder.path, fileName);
-
-    // Copy the picked image to the desired path
-    return image.copy(savedImagePath);
   }
 
   @override
@@ -124,23 +137,30 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  _imageFile != null
-                      ? Image.file(
-                          _imageFile!,
+                  _base64Image != null
+                      ? Image.memory(
+                          base64Decode(_base64Image!),
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
                         )
                       : widget.currentMenu.image.isNotEmpty
-                          ? Image.network(
-                              widget.currentMenu.image,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            )
+                          ? (widget.currentMenu.image.startsWith('data:image')
+                              ? Image.memory(
+                                  base64Decode(widget.currentMenu.image),
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/images/menu/${widget.currentMenu.image}',
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ))
                           : Container(
-                              width: 100,
-                              height: 100,
+                              width: 150,
+                              height: 150,
                               color: Colors.grey[300],
                               child: const Icon(Icons.image, size: 50),
                             ),
@@ -182,12 +202,12 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
                     });
                   }
                 },
-                child: const Text('Add Menu Items'),
+                child: Text(
+                    widget.isEditing ? 'Edit Menu Items' : 'Add Menu Items'),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  // Load the user information from preferences or wherever it is stored
                   LoginResponse? user =
                       await LoginResponse.loadFromPreferences();
 
@@ -195,43 +215,48 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
                     _formKey.currentState!.save();
 
                     String imagePath = '';
-                    if (_imageFile != null) {
-                      imagePath = _imageFile!.path; // Use the saved file path
-                    } else if (widget.currentMenu.image.isNotEmpty) {
-                      imagePath = widget.currentMenu.image;
+                    try {
+                      if (_base64Image != null) {
+                        imagePath = await _uploadImageToServer(_imageFile!);
+                      } else if (_imageFile != null) {
+                        imagePath = await _uploadImageToServer(_imageFile!);
+                      } else if (widget.currentMenu.image.isNotEmpty) {
+                        imagePath = widget.currentMenu.image;
+                      }
+
+                      final menu = Menu(
+                        menuID:
+                            widget.isEditing ? widget.currentMenu.menuID : 0,
+                        menuName: _menuNameController.text,
+                        description: _descriptionController.text,
+                        isActive: _isActive,
+                        createdBy: widget.isEditing
+                            ? widget.currentMenu.createdBy
+                            : user!.userId,
+                        createdAt: widget.isEditing
+                            ? widget.currentMenu.createdAt
+                            : DateTime.now().toString(),
+                        updatedBy: user!.userId,
+                        updatedAt: DateTime.now().toString(),
+                        menuItems: _menuItems,
+                        image: imagePath,
+                      );
+
+                      String? token = user.token;
+
+                      if (widget.isEditing) {
+                        await menuProvider.updateMenu(menu, token);
+                        print('Menu updated successfully');
+                      } else {
+                        menuProvider.addMenu(menu, token);
+                        print('Menu added successfully');
+                      }
+
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                    } catch (e) {
+                      print('Error saving menu: $e');
                     }
-
-                    final menu = Menu(
-                      menuID: widget.isEditing ? widget.currentMenu.menuID : 0,
-                      menuName: _menuNameController.text,
-                      description: _descriptionController.text,
-                      isActive: _isActive,
-                      createdBy: widget.isEditing
-                          ? widget.currentMenu.createdBy
-                          : user!.userId,
-                      createdAt: widget.isEditing
-                          ? widget.currentMenu.createdAt
-                          : DateTime.now().toString(),
-                      updatedBy: user!.userId,
-                      updatedAt: DateTime.now().toString(),
-                      menuItems: _menuItems,
-                      image: imagePath,
-                    );
-
-                    // Use the user's token for API requests
-                    String? token =
-                        user.token; // Adjust to fetch the token properly
-
-                    if (widget.isEditing) {
-                      await menuProvider.updateMenu(
-                          menu, token); // Pass the token when updating
-                    } else {
-                      menuProvider.addMenu(
-                          menu, token); // Pass the token when creating
-                    }
-
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
                   }
                 },
                 child: Text(widget.isEditing ? 'Update Menu' : 'Create Menu'),

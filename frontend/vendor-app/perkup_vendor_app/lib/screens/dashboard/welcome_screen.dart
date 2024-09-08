@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:perkup_vendor_app/screens/menu/menu_list_screen.dart';
 import 'package:perkup_vendor_app/screens/perk/perk_list_screen.dart';
 import 'package:perkup_vendor_app/screens/perktype/perktype_list_screen.dart';
+import 'package:perkup_vendor_app/screens/qr_code_scanner_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   WelcomeScreen({super.key}); // Removed `const` here if required
@@ -21,6 +22,11 @@ class WelcomeScreen extends StatelessWidget {
       'icon': Icons.handshake,
       'label': 'Manage Menu',
       'screen': const MenuListScreen(),
+    },
+    {
+      'icon': Icons.handshake,
+      'label': 'Scan QR Code',
+      'screen': const QRCodeScannerScreen(),
     },
   ];
 
@@ -59,10 +65,10 @@ class WelcomeScreen extends StatelessWidget {
                 style: const TextStyle(color: Colors.white),
               ),
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                fixedSize: MaterialStateProperty.all<Size>(const Size(200, 80)),
-                elevation: MaterialStateProperty.all<double>(3),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                fixedSize: WidgetStateProperty.all<Size>(const Size(200, 80)),
+                elevation: WidgetStateProperty.all<double>(3),
+                shape: WidgetStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

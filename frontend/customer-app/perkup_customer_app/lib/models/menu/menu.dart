@@ -1,6 +1,17 @@
 import 'package:perkup_customer_app/models/menu/menuitem.dart';
 
 class Menu {
+  final int menuID;
+  final String menuName;
+  final String description;
+  final String image;
+  final bool isActive;
+  final int createdBy;
+  final DateTime createdAt;
+  final int updatedBy;
+  final DateTime updatedAt;
+  List<MenuItem> menuItems;
+
   Menu({
     required this.menuID,
     required this.menuName,
@@ -11,46 +22,39 @@ class Menu {
     required this.createdAt,
     required this.updatedBy,
     required this.updatedAt,
-    required this.menuItems,
-  });
+    List<MenuItem>? menuItems,
+  }) : menuItems = menuItems ?? []; // Initialize with empty list if null
 
-  late final int menuID;
-  late final String menuName;
-  late final String description;
-  late final String image;
-  late final bool isActive;
-  late final int createdBy;
-  late final String createdAt;
-  late final int updatedBy;
-  late final String updatedAt;
-  late final List<MenuItem> menuItems;
-
-  Menu.fromJson(Map<String, dynamic> json) {
-    menuID = json['menuID'];
-    menuName = json['menuName'];
-    description = json['description'];
-    image = json['image'];
-    isActive = json['isActive'];
-    createdBy = json['createdBy'];
-    createdAt = json['createdAt'];
-    updatedBy = json['updatedBy'];
-    updatedAt = json['updatedAt'];
-    menuItems =
-        List.from(json['menuItems']).map((e) => MenuItem.fromJson(e)).toList();
+  factory Menu.fromJson(Map<String, dynamic> json) {
+    return Menu(
+      menuID: json['menuID'],
+      menuName: json['menuName'],
+      description: json['description'],
+      image: json['image'],
+      isActive: json['isActive'],
+      createdBy: json['createdBy'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedBy: json['updatedBy'],
+      updatedAt: DateTime.parse(json['updatedAt']),
+      menuItems: (json['menuItems'] as List<dynamic>?)
+              ?.map((itemJson) => MenuItem.fromJson(itemJson))
+              .toList() ??
+          [],
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['menuID'] = menuID;
-    data['menuName'] = menuName;
-    data['description'] = description;
-    data['image'] = image;
-    data['isActive'] = isActive;
-    data['createdBy'] = createdBy;
-    data['createdAt'] = createdAt;
-    data['updatedBy'] = updatedBy;
-    data['updatedAt'] = updatedAt;
-    data['menuItems'] = menuItems.map((e) => e.toJson()).toList();
-    return data;
+    return {
+      'menuID': menuID,
+      'menuName': menuName,
+      'description': description,
+      'image': image,
+      'isActive': isActive,
+      'createdBy': createdBy,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedBy': updatedBy,
+      'updatedAt': updatedAt.toIso8601String(),
+      'menuItems': menuItems.map((item) => item.toJson()).toList(),
+    };
   }
 }
