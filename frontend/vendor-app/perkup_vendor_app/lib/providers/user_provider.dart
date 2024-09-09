@@ -30,6 +30,25 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<User?> getUserById(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    // try {
+    // Fetch user details from the service
+    _currentUser = await _userService.fetchUserById(id);
+    print(_currentUser);
+    return _currentUser; // Return the fetched user data
+    // } catch (e) {
+    //   _errorMessage = e.toString();
+    //   return null; // Return null on error
+    // } finally {
+    //   _isLoading = false;
+    //   notifyListeners();
+    // }
+  }
+
   Future<bool> createUser(User user) async {
     _isLoading = true;
     _errorMessage = null;

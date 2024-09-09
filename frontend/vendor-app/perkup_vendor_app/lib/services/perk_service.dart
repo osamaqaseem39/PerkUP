@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perkup_vendor_app/models/perk/perk.dart';
 
 class PerkService {
-  static const String baseUrl = 'https://localhost:44320/api';
+  static const String baseUrl = 'https://192.168.10.18:7295/api';
 
   Future<List<Perk>> fetchPerks(String token) async {
     final response = await http.get(
@@ -15,39 +15,54 @@ class PerkService {
 
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
-      return jsonResponse.map((perkType) => Perk.fromJson(perkType)).toList();
+      return jsonResponse.map((perk) => Perk.fromJson(perk)).toList();
     } else {
-      throw Exception('Failed to load perk types');
+      throw Exception('Failed to load perks');
     }
   }
 
-  Future<void> createPerk(Perk perkType, String token) async {
+  Future<Perk> fetchPerkById(int id, String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/Perks/$id'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return Perk.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load perk');
+    }
+  }
+
+  Future<void> createPerk(Perk perk, String token) async {
     final response = await http.post(
       Uri.parse('$baseUrl/Perks'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(perkType.toJson()),
+      body: jsonEncode(perk.toJson()),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to create perk type');
+      throw Exception('Failed to create perk');
     }
   }
 
-  Future<void> updatePerk(Perk perkType, String token) async {
+  Future<void> updatePerk(Perk perk, String token) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/Perks/${perkType.perkID}'),
+      Uri.parse('$baseUrl/Perks/${perk.perkID}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(perkType.toJson()),
+      body: jsonEncode(perk.toJson()),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update perk type');
+      throw Exception('Failed to update perk');
     }
   }
 
@@ -60,7 +75,7 @@ class PerkService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to delete perk type');
+      throw Exception('Failed to delete perk');
     }
   }
 }

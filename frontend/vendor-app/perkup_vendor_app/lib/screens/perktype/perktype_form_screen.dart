@@ -45,67 +45,69 @@ class _PerkTypeFormScreenState extends State<PerkTypeFormScreen> {
         title:
             Text(widget.perkType == null ? 'New Perk Type' : 'Edit Perk Type'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                initialValue: widget.perkType?.typeName,
-                decoration: const InputDecoration(labelText: 'Type Name'),
-                onSaved: (value) => _typeName = value!,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter a type name' : null,
-              ),
-              TextFormField(
-                initialValue: widget.perkType?.description,
-                decoration: const InputDecoration(labelText: 'Description'),
-                onSaved: (value) => _description = value!,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter a description' : null,
-              ),
-              SwitchListTile(
-                title: const Text('Is Active'),
-                value: _isActive,
-                onChanged: (value) {
-                  setState(() {
-                    _isActive = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  LoginResponse? user =
-                      await LoginResponse.loadFromPreferences();
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  initialValue: widget.perkType?.typeName,
+                  decoration: const InputDecoration(labelText: 'Type Name'),
+                  onSaved: (value) => _typeName = value!,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter a type name' : null,
+                ),
+                TextFormField(
+                  initialValue: widget.perkType?.description,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  onSaved: (value) => _description = value!,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter a description' : null,
+                ),
+                SwitchListTile(
+                  title: const Text('Is Active'),
+                  value: _isActive,
+                  onChanged: (value) {
+                    setState(() {
+                      _isActive = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    LoginResponse? user =
+                        await LoginResponse.loadFromPreferences();
 
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    final perkType = PerkType(
-                      perkTypeID: widget.perkType?.perkTypeID ?? 0,
-                      typeName: _typeName,
-                      description: _description,
-                      isActive: _isActive,
-                      createdAt:
-                          DateTime.now().toString().replaceFirst(" ", "T"),
-                      updatedBy: user!.userId,
-                      updatedAt:
-                          DateTime.now().toString().replaceFirst(" ", "T"),
-                      createdBy: user.userId,
-                    );
-                    if (widget.perkType == null) {
-                      perkTypeProvider.createPerkType(perkType, token!);
-                    } else {
-                      perkTypeProvider.updatePerkType(perkType, token!);
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      final perkType = PerkType(
+                        perkTypeID: widget.perkType?.perkTypeID ?? 0,
+                        typeName: _typeName,
+                        description: _description,
+                        isActive: _isActive,
+                        createdAt:
+                            DateTime.now().toString().replaceFirst(" ", "T"),
+                        updatedBy: user!.userId,
+                        updatedAt:
+                            DateTime.now().toString().replaceFirst(" ", "T"),
+                        createdBy: user.userId,
+                      );
+                      if (widget.perkType == null) {
+                        perkTypeProvider.createPerkType(perkType, token!);
+                      } else {
+                        perkTypeProvider.updatePerkType(perkType, token!);
+                      }
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
                     }
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: Text(widget.perkType == null ? 'Create' : 'Update'),
-              ),
-            ],
+                  },
+                  child: Text(widget.perkType == null ? 'Create' : 'Update'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

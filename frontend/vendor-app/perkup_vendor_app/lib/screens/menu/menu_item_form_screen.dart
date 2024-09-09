@@ -42,10 +42,10 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
         isPercentageDiscount: _isPercentageDiscount,
         isActive: true,
         category: _categoryController.text,
-        createdBy: currentUserId ?? 0, // Use the current user's ID
-        createdAt: DateTime.now().toString(),
-        updatedBy: currentUserId ?? 0, // Use the current user's ID
-        updatedAt: DateTime.now().toString(),
+        createdAt: DateTime.now().toString().replaceFirst(" ", "T"),
+        updatedBy: currentUserId,
+        updatedAt: DateTime.now().toString().replaceFirst(" ", "T"),
+        createdBy: currentUserId,
         image: _imageController.text,
       );
 
@@ -98,32 +98,100 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
       appBar: AppBar(
         title: const Text('Add/Update Menu Items'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _itemNameController,
-                decoration: const InputDecoration(labelText: 'Item Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an item name';
-                  }
-                  return null;
-                },
-              ),
-              // Other form fields...
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _addOrUpdateItem,
-                child: Text(
-                    _editingItemIndex == null ? 'Add Item' : 'Update Item'),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _itemNameController,
+                  decoration: const InputDecoration(labelText: 'Item Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an item name';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a price';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _discountController,
+                  decoration: const InputDecoration(labelText: 'Discount'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a discount';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _isPercentageDiscount,
+                      onChanged: (value) {
+                        setState(() {
+                          _isPercentageDiscount = value ?? false;
+                        });
+                      },
+                    ),
+                    const Text('Percentage Discount'),
+                  ],
+                ),
+                TextFormField(
+                  controller: _categoryController,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a category';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _imageController,
+                  decoration: const InputDecoration(labelText: 'Image URL'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _addOrUpdateItem,
+                  child: Text(
+                      _editingItemIndex == null ? 'Add Item' : 'Update Item'),
+                ),
+                const SizedBox(height: 20),
+                // Expanded(
+                //   child:
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: widget.menuItems.length,
                   itemBuilder: (context, index) {
                     final item = widget.menuItems[index];
@@ -137,14 +205,15 @@ class _MenuItemFormScreenState extends State<MenuItemFormScreen> {
                     );
                   },
                 ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, widget.menuItems);
-                },
-                child: const Text('Done'),
-              ),
-            ],
+                // ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, widget.menuItems);
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

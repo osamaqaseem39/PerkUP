@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:perkup_vendor_app/screens/confirmation_screen.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class QRCodeScannerScreen extends StatefulWidget {
@@ -11,12 +12,28 @@ class QRCodeScannerScreen extends StatefulWidget {
 }
 
 class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
-  MobileScannerController? _controller;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? _controller;
+  String? scannedText;
 
   @override
   void initState() {
     super.initState();
-    _controller = MobileScannerController();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (_controller != null) {
+      _controller!.pauseCamera();
+      _controller!.resumeCamera();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 
   @override
@@ -25,37 +42,94 @@ class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
       appBar: AppBar(
         title: const Text('Scan QR Code'),
       ),
-      body: MobileScanner(
-        controller: _controller,
-        onDetect: (BarcodeCapture barcodeCapture) {
-          // Handle the scanned barcode data
-          final qrData = barcodeCapture.barcodes.first.rawValue;
-          _handleQRData(qrData);
-        },
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
+              overlay: QrScannerOverlayShape(
+                borderColor: Colors.red,
+                borderRadius: 10,
+                borderLength: 30,
+                borderWidth: 10,
+                cutOutSize: MediaQuery.of(context).size.width * 0.8,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text(
+                scannedText != null ? 'Scanned: $scannedText' : 'Scan a code',
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void _handleQRData(String? qrData) {
-    if (qrData == null) return;
+  Future<void> _onQRViewCreated(QRViewController controller) async {
+    await _requestCameraPermission();
+    setState(() {
+      _controller = controller;
+    });
 
-    // Parse QR data
-    final parts = qrData.split('|');
-    if (parts.length != 2) {
+    controller.scannedDataStream.listen((scanData) async {
+      scannedText = scanData.code;
+      _handleQRData(scannedText);
+      await controller.pauseCamera();
+      // Delay to prevent multiple scans in quick succession
+      await Future.delayed(const Duration(seconds: 1));
+      await controller.resumeCamera();
+    });
+  }
+
+  Future<void> _requestCameraPermission() async {
+    // Implement camera permission request if needed
+  }
+
+  void _handleQRData(String? qrData) {
+    if (qrData == null || qrData.isEmpty) {
       _showToast('Invalid QR Code');
       return;
     }
 
-    final perkId = parts[0].split(':')[1];
-    final userId = parts[1].split(':')[1];
+    // Parse QR data
+    final parts = qrData.split('|');
+    if (parts.length != 2) {
+      _showToast('Invalid QR Code Format');
+      return;
+    }
 
-    // Implement your logic to verify the perk or menu item here
-    // Example: Validate the perk ID and user ID, then show a confirmation message
-    _showToast('Scanned Perk ID: $perkId, User ID: $userId');
+    try {
+      final perkId = _parseData(parts[0]);
+      final userId = _parseData(parts[1]);
 
-    // Stop the camera after scanning
-    _controller?.dispose();
-    Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConfirmationScreen(
+            perkId: double.parse(perkId).toInt(),
+            userId: double.parse(userId).toInt(),
+          ),
+        ),
+      );
+
+      // Implement your logic to verify the perk or menu item here
+      _showToast('Scanned Perk ID: $perkId, User ID: $userId');
+    } catch (e) {
+      _showToast('Error parsing QR Code');
+    }
+  }
+
+  String _parseData(String part) {
+    final data = part.split(':');
+    if (data.length != 2) throw const FormatException('Invalid Data Format');
+    return data[1];
   }
 
   void _showToast(String message) {
@@ -67,11 +141,5 @@ class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
       textColor: Colors.white,
       fontSize: 16.0,
     );
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
   }
 }

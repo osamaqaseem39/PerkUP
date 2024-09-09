@@ -107,6 +107,7 @@ class MenuProvider with ChangeNotifier {
   void _setLoading(bool value) {
     print('Setting loading state to: $value'); // Debug statement
     _isLoading = value;
+
     notifyListeners();
   }
 

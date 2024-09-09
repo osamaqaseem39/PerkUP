@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using adminAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -21,45 +22,115 @@ public class AddressesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
     {
-        List<Address> addresses = new List<Address>();
+        var addresses = new List<Address>();
+        var cities = new List<City>();
+        var countries = new List<Country>();
+        var areas = new List<Area>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
+            await connection.OpenAsync();
+
+            // Get Addresses
             using (SqlCommand command = new SqlCommand("GetAllAddresses", connection))
             {
                 command.CommandType = CommandType.StoredProcedure;
-                await connection.OpenAsync();
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
-                        Address address = new Address
+                        addresses.Add(new Address
                         {
-
                             AddressID = (int)reader["AddressID"],
-
                             Name = reader["Name"].ToString(),
                             Street = reader["Street"].ToString(),
-                            AreaID = (int)reader["AreaID"],
-                            CityID = (int)reader["CityID"],
+                            AreaID = reader["AreaID"] != DBNull.Value ? (int)reader["AreaID"] : (int?)null,
+                            CityID = reader["CityID"] != DBNull.Value ? (int)reader["CityID"] : (int?)null,
                             State = reader["State"].ToString(),
                             PostalCode = reader["PostalCode"].ToString(),
-                            CountryID = (int)reader["CountryID"],
+                            CountryID = reader["CountryID"] != DBNull.Value ? (int)reader["CountryID"] : (int?)null,
                             Latitude = reader["Latitude"] != DBNull.Value ? (decimal)reader["Latitude"] : (decimal?)null,
                             Longitude = reader["Longitude"] != DBNull.Value ? (decimal)reader["Longitude"] : (decimal?)null,
-                            CreatedBy = (int)reader["CreatedBy"],
-                            CreatedAt = (DateTime)reader["CreatedAt"],
-                            UpdatedBy = (int)reader["UpdatedBy"],
-                            UpdatedAt = (DateTime)reader["UpdatedAt"]
-                        };
-                        addresses.Add(address);
+                            CreatedBy = Convert.ToInt32(reader["CreatedBy"]),
+                            CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
+                            UpdatedBy = Convert.ToInt32(reader["UpdatedBy"]),
+                            UpdatedAt = Convert.ToDateTime(reader["UpdatedAt"]),
+                            City = string.Empty, // Placeholder for City
+                            Country = string.Empty, // Placeholder for Country
+                            Area = string.Empty // Placeholder for Area
+                        });
                     }
                 }
+            }
+
+            // Get Cities
+            using (SqlCommand command = new SqlCommand("GetAllCities", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        cities.Add(new City
+                        {
+                            CityID = (int)reader["CityID"],
+                            CityName = reader["CityName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            // Get Countries
+            using (SqlCommand command = new SqlCommand("GetAllCountries", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        countries.Add(new Country
+                        {
+                            CountryID = (int)reader["CountryID"],
+                            CountryName = reader["CountryName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            // Get Areas
+            using (SqlCommand command = new SqlCommand("GetAllAreas", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        areas.Add(new Area
+                        {
+                            AreaID = (int)reader["AreaID"],
+                            AreaName = reader["AreaName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            // Map City, Country, and Area to Address
+            foreach (var address in addresses)
+            {
+                var city = cities.FirstOrDefault(c => c.CityID == address.CityID);
+                var country = countries.FirstOrDefault(c => c.CountryID == address.CountryID);
+                var area = areas.FirstOrDefault(a => a.AreaID == address.AreaID);
+
+                if (city != null) address.City = city.CityName;
+                if (country != null) address.Country = country.CountryName;
+                if (area != null) address.Area = area.AreaName;
             }
         }
 
         return addresses;
     }
+
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateAddress([FromBody] Address address)

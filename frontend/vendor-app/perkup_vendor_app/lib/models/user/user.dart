@@ -53,9 +53,9 @@ class User {
     description = json['description'];
     addressID = json['addressID'];
     createdBy = json['createdBy'];
-    createdAt = DateTime as String;
+    createdAt = json['createdAt'];
     updatedBy = json['updatedBy'];
-    updatedAt = DateTime as String;
+    updatedAt = json['updatedAt'];
   }
 
   // Convert a User to JSON

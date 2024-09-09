@@ -15,19 +15,19 @@ class MenuItem {
       required this.updatedBy,
       required this.updatedAt});
 
-  late final int menuItemID;
-  late final int menuID;
+  late final dynamic menuItemID;
+  late final dynamic menuID;
   late final String itemName;
   late final String description;
   late final String image;
-  late final int price;
-  late final int discount;
+  late final dynamic price;
+  late final dynamic discount;
   late final bool isPercentageDiscount;
   late final bool isActive;
   late final String category;
-  late final int createdBy;
+  late final dynamic createdBy;
   late final String createdAt;
-  late final int updatedBy;
+  late final dynamic updatedBy;
   late final String updatedAt;
 
   MenuItem.fromJson(Map<String, dynamic> json) {

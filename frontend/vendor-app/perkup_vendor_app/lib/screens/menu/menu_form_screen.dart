@@ -114,154 +114,154 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
       appBar: AppBar(
         title: Text(widget.isEditing ? 'Edit Menu' : 'Create Menu'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _menuNameController,
-                decoration: const InputDecoration(labelText: 'Menu Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a menu name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  _base64Image != null
-                      ? Image.memory(
-                          base64Decode(_base64Image!),
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        )
-                      : widget.currentMenu.image.isNotEmpty
-                          ? (widget.currentMenu.image.startsWith('data:image')
-                              ? Image.memory(
-                                  base64Decode(widget.currentMenu.image),
-                                  width: 150,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  'assets/images/menu/${widget.currentMenu.image}',
-                                  width: 150,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                ))
-                          : Container(
-                              width: 150,
-                              height: 150,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.image, size: 50),
-                            ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    child: const Text('Select Image'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text('Active'),
-                  Switch(
-                    value: _isActive,
-                    onChanged: (value) {
-                      setState(() {
-                        _isActive = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MenuItemFormScreen(
-                        menuItems: _menuItems,
-                      ),
-                    ),
-                  );
-                  if (result != null && result is List<MenuItem>) {
-                    setState(() {
-                      _menuItems = result;
-                    });
-                  }
-                },
-                child: Text(
-                    widget.isEditing ? 'Edit Menu Items' : 'Add Menu Items'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  LoginResponse? user =
-                      await LoginResponse.loadFromPreferences();
-
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-
-                    String imagePath = '';
-                    try {
-                      if (_base64Image != null) {
-                        imagePath = await _uploadImageToServer(_imageFile!);
-                      } else if (_imageFile != null) {
-                        imagePath = await _uploadImageToServer(_imageFile!);
-                      } else if (widget.currentMenu.image.isNotEmpty) {
-                        imagePath = widget.currentMenu.image;
-                      }
-
-                      final menu = Menu(
-                        menuID:
-                            widget.isEditing ? widget.currentMenu.menuID : 0,
-                        menuName: _menuNameController.text,
-                        description: _descriptionController.text,
-                        isActive: _isActive,
-                        createdBy: widget.isEditing
-                            ? widget.currentMenu.createdBy
-                            : user!.userId,
-                        createdAt: widget.isEditing
-                            ? widget.currentMenu.createdAt
-                            : DateTime.now().toString(),
-                        updatedBy: user!.userId,
-                        updatedAt: DateTime.now().toString(),
-                        menuItems: _menuItems,
-                        image: imagePath,
-                      );
-
-                      String? token = user.token;
-
-                      if (widget.isEditing) {
-                        await menuProvider.updateMenu(menu, token);
-                        print('Menu updated successfully');
-                      } else {
-                        menuProvider.addMenu(menu, token);
-                        print('Menu added successfully');
-                      }
-
-                      // ignore: use_build_context_synchronously
-                      Navigator.pop(context);
-                    } catch (e) {
-                      print('Error saving menu: $e');
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _menuNameController,
+                  decoration: const InputDecoration(labelText: 'Menu Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a menu name';
                     }
-                  }
-                },
-                child: Text(widget.isEditing ? 'Update Menu' : 'Create Menu'),
-              ),
-            ],
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _base64Image != null
+                        ? Image.memory(
+                            base64Decode(_base64Image!),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : widget.currentMenu.image.isNotEmpty
+                            ? (widget.currentMenu.image.startsWith('data:image')
+                                ? Image.memory(
+                                    base64Decode(widget.currentMenu.image),
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/images/menu/${widget.currentMenu.image}',
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  ))
+                            : Container(
+                                width: 150,
+                                height: 150,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.image, size: 50),
+                              ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Select Image'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Text('Active'),
+                    Switch(
+                      value: _isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          _isActive = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MenuItemFormScreen(
+                          menuItems: _menuItems,
+                        ),
+                      ),
+                    );
+                    if (result != null && result is List<MenuItem>) {
+                      setState(() {
+                        _menuItems = result;
+                      });
+                    }
+                  },
+                  child: Text(
+                      widget.isEditing ? 'Edit Menu Items' : 'Add Menu Items'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    LoginResponse? user =
+                        await LoginResponse.loadFromPreferences();
+
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+
+                      String imagePath = '';
+                      try {
+                        if (_base64Image != null) {
+                          imagePath = await _uploadImageToServer(_imageFile!);
+                        } else if (_imageFile != null) {
+                          imagePath = await _uploadImageToServer(_imageFile!);
+                        } else if (widget.currentMenu.image.isNotEmpty) {
+                          imagePath = widget.currentMenu.image;
+                        }
+
+                        final menu = Menu(
+                          menuID:
+                              widget.isEditing ? widget.currentMenu.menuID : 0,
+                          menuName: _menuNameController.text,
+                          description: _descriptionController.text,
+                          isActive: _isActive,
+                          createdAt:
+                              DateTime.now().toString().replaceFirst(" ", "T"),
+                          updatedBy: user!.userId,
+                          updatedAt:
+                              DateTime.now().toString().replaceFirst(" ", "T"),
+                          createdBy: user.userId,
+                          menuItems: _menuItems,
+                          image: imagePath,
+                        );
+
+                        String? token = user.token;
+
+                        if (widget.isEditing) {
+                          await menuProvider.updateMenu(menu, token);
+                          print('Menu updated successfully');
+                        } else {
+                          await menuProvider.createMenu(menu, token);
+                          print('Menu added successfully');
+                        }
+                        await Future.delayed(Duration(seconds: 3));
+
+                        Navigator.pop(context);
+                      } catch (e) {
+                        print('Error saving menu: $e');
+                      }
+                    }
+                  },
+                  child: Text(widget.isEditing ? 'Update Menu' : 'Create Menu'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

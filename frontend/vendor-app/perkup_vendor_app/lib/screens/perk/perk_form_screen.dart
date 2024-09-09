@@ -116,139 +116,142 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
       appBar: AppBar(
         title: Text(widget.perk == null ? 'New Perk' : 'Edit Perk'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                DropdownButtonFormField<int>(
-                  value: _perkType,
-                  onChanged: (value) {
-                    setState(() {
-                      _perkType = value!;
-                    });
-                  },
-                  items: perkTypeProvider.perkTypes.map((perkType) {
-                    return DropdownMenuItem<int>(
-                      value: perkType.perkTypeID,
-                      child: Text(perkType.typeName),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    labelText: 'Select Perk Type',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                TextFormField(
-                  initialValue: widget.perk?.perkName,
-                  decoration: const InputDecoration(labelText: 'Perk Name'),
-                  onSaved: (value) => _perkName = value!,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter a perk name' : null,
-                ),
-                TextFormField(
-                  initialValue: widget.perk?.description,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  onSaved: (value) => _description = value!,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter a description' : null,
-                ),
-                TextFormField(
-                  initialValue: widget.perk?.value.toString(),
-                  decoration: const InputDecoration(labelText: 'Value'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (value) => _value = int.parse(value!),
-                  validator: (value) => value!.isEmpty ? 'Enter a value' : null,
-                ),
-                InkWell(
-                  onTap: () => _selectDate(context, true),
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Start Date',
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Text(_formatDate(_startDate)),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                InkWell(
-                  onTap: () => _selectDate(context, false),
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'End Date',
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Text(_formatDate(_endDate)),
-                  ),
-                ),
-                TextFormField(
-                  initialValue: widget.perk?.minPurchaseAmount.toString(),
-                  decoration:
-                      const InputDecoration(labelText: 'Min Purchase Amount'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (value) => _minPurchaseAmount = int.parse(value!),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter a min purchase amount' : null,
-                ),
-                TextFormField(
-                  initialValue: widget.perk?.maxDiscountAmount.toString(),
-                  decoration:
-                      const InputDecoration(labelText: 'Max Discount Amount'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (value) => _maxDiscountAmount = int.parse(value!),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter a max discount amount' : null,
-                ),
-                SwitchListTile(
-                  title: const Text('Is Active'),
-                  value: _isActive,
-                  onChanged: (value) {
-                    setState(() {
-                      _isActive = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    LoginResponse? user =
-                        await LoginResponse.loadFromPreferences();
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-
-                      final perk = Perk(
-                        perkID: widget.perk?.perkID ??
-                            0, // Use default value if null
-                        perkType: _perkType!,
-                        perkName: _perkName,
-                        description: _description,
-                        value: _value,
-                        startDate: _formatDate(_startDate),
-                        endDate: _formatDate(_endDate),
-                        minPurchaseAmount: _minPurchaseAmount,
-                        maxDiscountAmount: _maxDiscountAmount,
-                        isActive: _isActive,
-                        createdBy: user!.userId,
-                        createdAt: _formatDate(DateTime.now()),
-                        updatedBy: user.userId,
-                        updatedAt: _formatDate(DateTime.now()),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  DropdownButtonFormField<int>(
+                    value: _perkType,
+                    onChanged: (value) {
+                      setState(() {
+                        _perkType = value!;
+                      });
+                    },
+                    items: perkTypeProvider.perkTypes.map((perkType) {
+                      return DropdownMenuItem<int>(
+                        value: perkType.perkTypeID,
+                        child: Text(perkType.typeName),
                       );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      labelText: 'Select Perk Type',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  TextFormField(
+                    initialValue: widget.perk?.perkName,
+                    decoration: const InputDecoration(labelText: 'Perk Name'),
+                    onSaved: (value) => _perkName = value!,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter a perk name' : null,
+                  ),
+                  TextFormField(
+                    initialValue: widget.perk?.description,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    onSaved: (value) => _description = value!,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter a description' : null,
+                  ),
+                  TextFormField(
+                    initialValue: widget.perk?.value.toString(),
+                    decoration: const InputDecoration(labelText: 'Value'),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => _value = int.parse(value!),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter a value' : null,
+                  ),
+                  InkWell(
+                    onTap: () => _selectDate(context, true),
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Start Date',
+                        border: OutlineInputBorder(),
+                      ),
+                      child: Text(_formatDate(_startDate)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () => _selectDate(context, false),
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'End Date',
+                        border: OutlineInputBorder(),
+                      ),
+                      child: Text(_formatDate(_endDate)),
+                    ),
+                  ),
+                  TextFormField(
+                    initialValue: widget.perk?.minPurchaseAmount.toString(),
+                    decoration:
+                        const InputDecoration(labelText: 'Min Purchase Amount'),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => _minPurchaseAmount = int.parse(value!),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter a min purchase amount' : null,
+                  ),
+                  TextFormField(
+                    initialValue: widget.perk?.maxDiscountAmount.toString(),
+                    decoration:
+                        const InputDecoration(labelText: 'Max Discount Amount'),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => _maxDiscountAmount = int.parse(value!),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter a max discount amount' : null,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Is Active'),
+                    value: _isActive,
+                    onChanged: (value) {
+                      setState(() {
+                        _isActive = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      LoginResponse? user =
+                          await LoginResponse.loadFromPreferences();
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
 
-                      if (widget.perk == null) {
-                        await perkProvider.createPerk(perk, token!);
-                      } else {
-                        await perkProvider.updatePerk(perk, token!);
+                        final perk = Perk(
+                          perkID: widget.perk?.perkID ??
+                              0, // Use default value if null
+                          perkType: _perkType!,
+                          perkName: _perkName,
+                          description: _description,
+                          value: _value,
+                          startDate: _formatDate(_startDate),
+                          endDate: _formatDate(_endDate),
+                          minPurchaseAmount: _minPurchaseAmount,
+                          maxDiscountAmount: _maxDiscountAmount,
+                          isActive: _isActive,
+                          createdBy: user!.userId,
+                          createdAt: _formatDate(DateTime.now()),
+                          updatedBy: user.userId,
+                          updatedAt: _formatDate(DateTime.now()),
+                        );
+
+                        if (widget.perk == null) {
+                          await perkProvider.createPerk(perk, token!);
+                        } else {
+                          await perkProvider.updatePerk(perk, token!);
+                        }
+
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
                       }
-
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Text(widget.perk == null ? 'Create' : 'Update'),
-                ),
-              ],
+                    },
+                    child: Text(widget.perk == null ? 'Create' : 'Update'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

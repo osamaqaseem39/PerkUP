@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perkup_vendor_app/models/address/address.dart';
 
 class AddressService {
-  static const String baseUrl = 'https://localhost:44320/api';
+  static const String baseUrl = 'https://192.168.10.18:7295/api';
 
   Future<List<Address>> fetchAddresses(String token) async {
     final response = await http.get(

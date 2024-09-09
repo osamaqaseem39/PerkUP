@@ -14,14 +14,14 @@ class Menu {
     required this.menuItems,
   });
 
-  late final int menuID;
+  late final dynamic menuID;
   late final String menuName;
   late final String description;
   late final String image;
   late final bool isActive;
-  late final int createdBy;
+  late final dynamic createdBy;
   late final String createdAt;
-  late final int updatedBy;
+  late final dynamic updatedBy;
   late final String updatedAt;
   late final List<MenuItem> menuItems;
 

@@ -4,7 +4,7 @@ import 'package:perkup_vendor_app/models/menu/menu.dart';
 
 class MenuService {
   final String baseUrl =
-      'https://localhost:44320/api'; // Adjust the base URL as needed
+      'https://192.168.10.18:7295/api'; // Adjust the base URL as needed
 
   Future<List<Menu>> fetchMenus(String token) async {
     print('Fetching menus...'); // Debug statement
@@ -43,11 +43,12 @@ class MenuService {
         'Create menu response status code: ${response.statusCode}'); // Debug statement
     print('Create menu response body: ${response.body}'); // Debug statement
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       print('Menu created successfully'); // Debug statement
     } else {
-      print('Failed to create menu'); // Debug statement
-      throw Exception('Failed to create menu');
+      print('Failed to create menu ${response.statusCode}');
+      print('Failed to create menu ${response.body}'); // Debug statement
+      // throw Exception('Failed to create menu');
     }
   }
 

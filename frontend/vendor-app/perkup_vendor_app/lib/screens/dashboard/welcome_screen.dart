@@ -44,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+            crossAxisCount: 2,
             crossAxisSpacing: 20,
             mainAxisSpacing: 10,
           ),
@@ -65,10 +65,10 @@ class WelcomeScreen extends StatelessWidget {
                 style: const TextStyle(color: Colors.white),
               ),
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-                fixedSize: WidgetStateProperty.all<Size>(const Size(200, 80)),
-                elevation: WidgetStateProperty.all<double>(3),
-                shape: WidgetStateProperty.all<OutlinedBorder>(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                fixedSize: MaterialStateProperty.all<Size>(const Size(200, 80)),
+                elevation: MaterialStateProperty.all<double>(3),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

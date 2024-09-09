@@ -27,4 +27,7 @@ public class Address
     public DateTime? CreatedAt { get; set; }
     public int UpdatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public string? City { get; set; }
+    public string? Country { get; set; }
+    public string? Area { get; set; }
 }
