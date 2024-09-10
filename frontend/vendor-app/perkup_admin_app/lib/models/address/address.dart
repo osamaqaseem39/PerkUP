@@ -1,5 +1,5 @@
 class Address {
-  final int addressID;
+  final dynamic addressID;
   final String name;
   final String street;
   final String area;
@@ -7,14 +7,14 @@ class Address {
   final String state;
   final String postalCode;
   final String country;
-  final int? cityID;
-  final int? countryID;
-  final int? areaID;
-  final double? latitude;
-  final double? longitude;
-  final int? createdBy;
+  final dynamic cityID;
+  final dynamic countryID;
+  final dynamic areaID;
+  final dynamic latitude;
+  final dynamic longitude;
+  final dynamic createdBy;
   final String createdAt;
-  final int? updatedBy;
+  final dynamic updatedBy;
   final String updatedAt;
 
   Address({

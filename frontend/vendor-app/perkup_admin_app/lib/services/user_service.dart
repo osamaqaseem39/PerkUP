@@ -41,7 +41,7 @@ class UserService {
       Uri.parse('$baseUrl/users'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
+        // 'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
@@ -54,14 +54,17 @@ class UserService {
 
   Future<void> updateUser(User user, String token) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/users/${user.userID}'),
+      Uri.parse('$baseUrl/Users/${user.userID}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
+        // 'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
 
+    print("Update Address  : ${jsonEncode(user.toJson())}");
+    print("Update Address  : ${response.statusCode}");
+    print("Update Address  : ${response.body}");
     if (response.statusCode != 200) {
       throw Exception('Failed to update user');
     }

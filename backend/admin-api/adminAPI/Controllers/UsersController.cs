@@ -106,7 +106,7 @@ public class UsersController : ControllerBase
     }
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, User user)
-    {
+        {
         try
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -124,23 +124,26 @@ public class UsersController : ControllerBase
                 command.Parameters.AddWithValue("@UserEmail", user.UserEmail);
                 command.Parameters.AddWithValue("@UserContact", user.UserContact);
                 command.Parameters.AddWithValue("@Password", PasswordHasher.HashPassword(user.Password)); // Hash password
+                command.Parameters.AddWithValue("@Images", user.Images);
+                command.Parameters.AddWithValue("@Description", user.Description);
+                command.Parameters.AddWithValue("@UpdatedBy", user.UpdatedBy);
+                command.Parameters.AddWithValue("@UpdatedAt", user.UpdatedAt);
+
                 command.Parameters.AddWithValue("@RoleID", user.RoleID);
                 command.Parameters.AddWithValue("@AddressID", user.AddressID);
 
                 // Open connection and execute the command
                 await connection.OpenAsync();
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                if (rowsAffected > 0)
-                    return Ok($"User with ID: {id} updated successfully.");
-                else
-                    return NotFound($"User with ID: {id} not found.");
-            }
+                await command.ExecuteNonQueryAsync();
+            
         }
+
+            return Ok("Address updated successfully.");
+    }
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred: {ex.Message}");
-        }
+}
     }
     [HttpDelete("{id}")]
 

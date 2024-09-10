@@ -15,19 +15,19 @@ class Perk {
     required this.updatedBy,
     required this.updatedAt,
   });
-  late final int perkID;
-  late final int perkType;
+  late final dynamic perkID;
+  late final dynamic perkType;
   late final String perkName;
   late final String description;
-  late final int value;
+  late final dynamic value;
   late final String startDate;
   late final String endDate;
   late final bool isActive;
-  late final int minPurchaseAmount;
-  late final int maxDiscountAmount;
-  late final int createdBy;
+  late final dynamic minPurchaseAmount;
+  late final dynamic maxDiscountAmount;
+  late final dynamic createdBy;
   late final String createdAt;
-  late final int updatedBy;
+  late final dynamic updatedBy;
   late final String updatedAt;
 
   Perk.fromJson(Map<String, dynamic> json) {

@@ -34,9 +34,9 @@ dependencies:
   http: ^0.13.3
   shared_preferences: ^2.0.6
   pretty_qr_code: ^2.0.0
-  location: ^4.3.0
+  # location: ^4.3.0
   flutter_local_notifications: ^9.0.0
-  google_maps_flutter: ^2.0.6
+  # google_maps_flutter: ^2.0.6
   font_awesome_flutter: ^9.0.0
   flutter_secure_storage: ^5.0.2
 

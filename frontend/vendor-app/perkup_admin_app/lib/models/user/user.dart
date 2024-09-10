@@ -13,8 +13,12 @@ class User {
     required this.roleID,
     required this.description,
     required this.addressID,
+    required this.createdBy,
+    required this.createdAt,
+    required this.updatedBy,
+    required this.updatedAt,
   });
-  late final int userID;
+  late final dynamic userID;
   late final String userType;
   late final String username;
   late final String displayName;
@@ -24,9 +28,13 @@ class User {
   late final String userContact;
   late final String password;
   late final String images;
-  late final int roleID;
+  late final dynamic roleID;
   late final String description;
-  late final int addressID;
+  late final dynamic addressID;
+  late final dynamic createdBy;
+  late final String createdAt;
+  late final dynamic updatedBy;
+  late final String updatedAt;
 
   User.fromJson(Map<String, dynamic> json) {
     userID = json['userID'];
@@ -42,6 +50,10 @@ class User {
     roleID = json['roleID'];
     description = json['description'];
     addressID = json['addressID'];
+    createdBy = json['createdBy'];
+    createdAt = json['createdAt'];
+    updatedBy = json['updatedBy'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +71,10 @@ class User {
     data['roleID'] = roleID;
     data['description'] = description;
     data['addressID'] = addressID;
+    data['createdBy'] = createdBy;
+    data['createdAt'] = createdAt;
+    data['updatedBy'] = updatedBy;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

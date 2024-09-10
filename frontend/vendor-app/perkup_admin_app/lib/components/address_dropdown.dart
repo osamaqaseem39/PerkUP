@@ -5,7 +5,7 @@ import 'package:perkup_admin_app/providers/address_provider.dart';
 
 class AddressDropdown extends StatefulWidget {
   final String token;
-  final Address? initialAddress;
+  final dynamic? initialAddress;
   final Function(Address) onAddressSelected;
 
   const AddressDropdown({
@@ -21,8 +21,8 @@ class AddressDropdown extends StatefulWidget {
 }
 
 class _AddressDropdownState extends State<AddressDropdown> {
-  Address? _selectedAddress;
-
+  dynamic? _selectedAddress;
+  Address? _selectedAddressValue;
   @override
   void initState() {
     super.initState();
@@ -30,10 +30,20 @@ class _AddressDropdownState extends State<AddressDropdown> {
     _fetchAddresses();
   }
 
-  void _fetchAddresses() {
+  void _fetchAddresses() async {
     final addressProvider =
         Provider.of<AddressProvider>(context, listen: false);
-    addressProvider.fetchAddresses(widget.token);
+    await addressProvider.fetchAddresses(widget.token);
+    if (_selectedAddress != null) {
+      if (addressProvider.addresses
+          .where((element) => element.addressID == _selectedAddress)
+          .isNotEmpty) {
+        _selectedAddressValue = addressProvider.addresses
+            .where((element) => element.addressID == _selectedAddress)
+            .first;
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -46,7 +56,7 @@ class _AddressDropdownState extends State<AddressDropdown> {
           return Text('Error: ${addressProvider.errorMessage}');
         } else {
           return DropdownButton<Address>(
-            value: _selectedAddress,
+            value: _selectedAddressValue,
             hint: const Text('Select an address'),
             items: addressProvider.addresses.map((Address address) {
               return DropdownMenuItem<Address>(
@@ -55,11 +65,10 @@ class _AddressDropdownState extends State<AddressDropdown> {
               );
             }).toList(),
             onChanged: (Address? newValue) {
-              setState(() {
-                _selectedAddress = newValue;
-              });
               if (newValue != null) {
+                _selectedAddressValue = newValue;
                 widget.onAddressSelected(newValue);
+                setState(() {});
               }
             },
           );

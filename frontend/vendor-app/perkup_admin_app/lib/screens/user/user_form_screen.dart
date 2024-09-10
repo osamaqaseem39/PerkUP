@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:perkup_admin_app/components/address_dropdown.dart';
 import 'package:perkup_admin_app/models/address/address.dart';
+import 'package:perkup_admin_app/models/login/login_response.dart';
 import 'package:provider/provider.dart';
 import 'package:perkup_admin_app/models/user/user.dart';
 import 'package:perkup_admin_app/providers/user_provider.dart';
@@ -18,6 +19,7 @@ class UserFormScreen extends StatefulWidget {
 
 class _UserFormScreenState extends State<UserFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  late String _userType;
   late String _username;
   late String _displayName;
   late String _firstName;
@@ -26,14 +28,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
   late String _userContact;
   late String _password;
   late String _images;
-  late int _roleID;
+  late dynamic _roleID;
   late String _description;
-  late int _addressID;
+  late dynamic _addressID;
 
   @override
   void initState() {
     super.initState();
     if (widget.user != null) {
+      _userType = widget.user!.userType;
       _username = widget.user!.username;
       _displayName = widget.user!.displayName;
       _firstName = widget.user!.firstName;
@@ -63,6 +66,35 @@ class _UserFormScreenState extends State<UserFormScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              DropdownButtonFormField<String>(
+                value: widget.user?.userType, // Initial value if any
+                decoration: const InputDecoration(
+                  labelText: 'User Type',
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'admin',
+                    child: Text('Admin'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'customer',
+                    child: Text('Customer'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'vendor',
+                    child: Text('Vendor'),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _username = value!;
+                  });
+                },
+                onSaved: (value) => _username = value!,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Select a user type'
+                    : null,
+              ),
               TextFormField(
                 initialValue: widget.user?.username,
                 decoration: const InputDecoration(labelText: 'Username'),
@@ -104,13 +136,6 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 validator: (value) => value!.isEmpty ? 'Enter a contact' : null,
               ),
               TextFormField(
-                initialValue: widget.user?.password,
-                decoration: const InputDecoration(labelText: 'Password'),
-                onSaved: (value) => _password = value!,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter a password' : null,
-              ),
-              TextFormField(
                 initialValue: widget.user?.images,
                 decoration: const InputDecoration(labelText: 'Images'),
                 onSaved: (value) => _images = value!,
@@ -119,7 +144,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               TextFormField(
                 initialValue: widget.user?.roleID.toString(),
                 decoration: const InputDecoration(labelText: 'Role ID'),
-                onSaved: (value) => _roleID = int.parse(value!),
+                onSaved: (value) => _roleID = value!,
                 validator: (value) => value!.isEmpty ? 'Enter a role ID' : null,
               ),
               TextFormField(
@@ -132,25 +157,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               AddressDropdown(
                 token: token!,
                 initialAddress: widget.user != null
-                    ? Address(
-                        addressID: widget.user!.addressID,
-                        name: "Selected Address",
-                        street: '',
-                        area: '',
-                        city: '',
-                        areaID: null,
-                        cityID: null,
-                        state: '',
-                        postalCode: '',
-                        country: '',
-                        countryID: null,
-                        latitude: null,
-                        longitude: null,
-                        createdBy: null,
-                        createdAt: '',
-                        updatedBy: null,
-                        updatedAt: '',
-                      )
+                    ? widget.user!.addressID
                     : null, // Replace with actual initial address if available
                 onAddressSelected: (Address selectedAddress) {
                   _addressID = selectedAddress.addressID;
@@ -159,12 +166,13 @@ class _UserFormScreenState extends State<UserFormScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
+                  LoginResponse? user1 =
+                      await LoginResponse.loadFromPreferences();
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     final user = User(
                       userID: widget.user?.userID ?? 0,
-                      userType:
-                          "userType", // Replace with actual userType value
+                      userType: _userType, // Replace with actual userType value
                       username: _username,
                       displayName: _displayName,
                       firstName: _firstName,
@@ -176,6 +184,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
                       roleID: _roleID,
                       description: _description,
                       addressID: _addressID,
+                      createdBy: user1!.userId,
+                      createdAt:
+                          DateTime.now().toString().replaceFirst(" ", "T"),
+                      updatedBy: user1.userId,
+                      updatedAt:
+                          DateTime.now().toString().replaceFirst(" ", "T"),
                     );
                     if (widget.user == null) {
                       await userProvider.createUser(user, token);

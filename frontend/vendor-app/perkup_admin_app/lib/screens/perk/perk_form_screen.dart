@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Add this for date formatting
+import 'package:intl/intl.dart';
 import 'package:perkup_admin_app/models/login/login_response.dart';
 import 'package:perkup_admin_app/models/perk/perk.dart';
 import 'package:perkup_admin_app/providers/perk_provider.dart';
@@ -19,15 +19,15 @@ class PerkFormScreen extends StatefulWidget {
 
 class _PerkFormScreenState extends State<PerkFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late int? _perkType;
+  late dynamic _perkType;
   late String _perkName;
   late String _description;
-  late int _value;
+  late dynamic _value;
   late DateTime _startDate;
   late DateTime _endDate;
   late bool _isActive;
-  late int _minPurchaseAmount;
-  late int _maxDiscountAmount;
+  late dynamic _minPurchaseAmount;
+  late dynamic _maxDiscountAmount;
 
   @override
   void initState() {
@@ -123,7 +123,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                DropdownButtonFormField<int>(
+                DropdownButtonFormField<dynamic>(
                   value: _perkType,
                   onChanged: (value) {
                     setState(() {
@@ -131,7 +131,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                     });
                   },
                   items: perkTypeProvider.perkTypes.map((perkType) {
-                    return DropdownMenuItem<int>(
+                    return DropdownMenuItem<dynamic>(
                       value: perkType.perkTypeID,
                       child: Text(perkType.typeName),
                     );
@@ -159,7 +159,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                   initialValue: widget.perk?.value.toString(),
                   decoration: const InputDecoration(labelText: 'Value'),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) => _value = int.parse(value!),
+                  onSaved: (value) => _value = value!,
                   validator: (value) => value!.isEmpty ? 'Enter a value' : null,
                 ),
                 InkWell(
@@ -188,7 +188,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                   decoration:
                       const InputDecoration(labelText: 'Min Purchase Amount'),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) => _minPurchaseAmount = int.parse(value!),
+                  onSaved: (value) => _minPurchaseAmount = value!,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter a min purchase amount' : null,
                 ),
@@ -197,7 +197,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                   decoration:
                       const InputDecoration(labelText: 'Max Discount Amount'),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) => _maxDiscountAmount = int.parse(value!),
+                  onSaved: (value) => _maxDiscountAmount = value!,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter a max discount amount' : null,
                 ),
@@ -218,7 +218,7 @@ class _PerkFormScreenState extends State<PerkFormScreen> {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       final perk = Perk(
-                        perkID: widget.perk!.perkID,
+                        perkID: widget.perk?.perkID,
                         perkType: _perkType!,
                         perkName: _perkName,
                         description: _description,

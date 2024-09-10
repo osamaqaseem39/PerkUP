@@ -5,7 +5,7 @@ import 'package:perkup_customer_app/models/menu/menuitem.dart';
 
 class MenuService {
   final String baseUrl =
-      'https://localhost:44320/api'; // Adjust the base URL as needed
+      'https://192.168.19.18:7295/api'; // Adjust the base URL as needed
 
   Future<List<Menu>> fetchMenusByCreatedBy(int createdBy, String token) async {
     try {

@@ -62,7 +62,6 @@ class AddressService {
       },
       body: jsonEncode(address.toJson()),
     );
-
     if (response.statusCode != 200) {
       throw Exception('Failed to update address');
     }

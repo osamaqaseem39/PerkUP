@@ -4,7 +4,7 @@ import 'package:perkup_customer_app/models/user/user.dart';
 import 'package:perkup_customer_app/models/user/userbytype.dart';
 
 class UserService {
-  static const String baseUrl = 'https://localhost:44320/api';
+  static const String baseUrl = 'https://192.168.19.18:7295/api';
   Future<List<UserByType>> fetchUsersByUserType(String userType) async {
     final response = await http.get(
       Uri.parse('$baseUrl/Users/GetByUserType/$userType'),

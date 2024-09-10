@@ -233,7 +233,6 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                         await addressProvider.updateAddress(address, token!);
                       }
 
-                      // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
                     }
                   },

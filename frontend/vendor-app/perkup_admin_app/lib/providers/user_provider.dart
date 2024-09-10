@@ -49,12 +49,12 @@ class UserProvider with ChangeNotifier {
     _errorMessage = null; // Reset error message before updating
     notifyListeners();
 
-    try {
-      await _userService.updateUser(user, token);
-      await fetchUsers(token); // Refresh the user list
-    } catch (e) {
-      _errorMessage = e.toString();
-    }
+    // try {
+    await _userService.updateUser(user, token);
+    await fetchUsers(token); // Refresh the user list
+    // } catch (e) {
+    //   _errorMessage = e.toString();
+    // }
 
     _isLoading = false;
     notifyListeners();

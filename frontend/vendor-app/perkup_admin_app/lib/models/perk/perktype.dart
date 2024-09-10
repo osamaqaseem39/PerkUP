@@ -9,13 +9,13 @@ class PerkType {
     required this.updatedBy,
     required this.updatedAt,
   });
-  late final int perkTypeID;
+  late final dynamic perkTypeID;
   late final String typeName;
   late final String description;
   late final bool isActive;
-  late final int createdBy;
+  late final dynamic createdBy;
   late final String createdAt;
-  late final int updatedBy;
+  late final dynamic updatedBy;
   late final String updatedAt;
 
   PerkType.fromJson(Map<String, dynamic> json) {
